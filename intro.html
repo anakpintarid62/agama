@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intro Anak Pintar Indonesia (Durasi 8 Detik)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+
+        /* Video Container Aspect Ratio 16:9 */
+        .video-frame {
+            aspect-ratio: 16/9;
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* --- Animations --- */
+        
+        .bg-shape {
+            position: absolute;
+            opacity: 0.15;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .logo-container {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .animate-logo {
+            animation: bounceIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0); }
+            60% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .icon-item {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .animate-icon {
+            animation: popUp 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tagline {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .animate-tagline {
+            animation: slideUpFade 0.8s ease-out forwards;
+            /* Delay updated to 3.0s to match slower voice pacing */
+            animation-delay: 3.0s; 
+        }
+
+        @keyframes slideUpFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .cta-btn {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .animate-cta {
+            animation: pulseFade 1s ease-in-out forwards;
+            /* Delay updated to 6.0s to allow tagline to finish */
+            animation-delay: 6.0s; 
+        }
+
+        @keyframes pulseFade {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Sparkles */
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FFD700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            opacity: 0;
+        }
+        
+        .animate-sparkle {
+            animation: sparkleAnim 1s linear infinite;
+        }
+
+        @keyframes sparkleAnim {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            50% { transform: scale(1) rotate(180deg); opacity: 1; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: #FFD700;
+            width: 0%;
+        }
+        
+        .animate-progress {
+            /* Updated to 8s */
+            animation: progress 8s linear forwards; 
+        }
+
+        @keyframes progress {
+            to { width: 100%; }
+        }
+
+        /* Overlays */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="videoStage" class="video-frame flex flex-col items-center justify-center text-white relative">
+        
+        <!-- Start Overlay -->
+        <div id="startOverlay" class="overlay">
+            <div class="text-center">
+                <div class="bg-white text-blue-500 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 animate-bounce">
+                    <i class="fa-solid fa-play text-3xl ml-1"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Anak Pintar Indonesia</h2>
+                <p class="text-gray-200 mb-6">Klik tombol di bawah untuk memutar (8 Detik)</p>
+                <button onclick="startVideo()" class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 px-8 rounded-full transition-transform active:scale-95 shadow-lg">
+                    Putar Video ▶
+                </button>
+            </div>
+        </div>
+
+        <!-- Replay Overlay -->
+        <div id="replayOverlay" class="overlay hidden">
+            <button onclick="startVideo()" class="bg-white text-blue-600 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+                <i class="fa-solid fa-rotate-right text-3xl"></i>
+            </button>
+        </div>
+
+        <!-- Background Shapes -->
+        <i class="fa-solid fa-shapes text-9xl text-white bg-shape" style="top: 10%; left: 10%;"></i>
+        <i class="fa-solid fa-puzzle-piece text-8xl text-yellow-300 bg-shape" style="top: 70%; right: 15%;"></i>
+        <i class="fa-solid fa-rocket text-8xl text-red-400 bg-shape" style="top: 20%; right: 10%;"></i>
+        <i class="fa-solid fa-graduation-cap text-9xl text-green-300 bg-shape" style="bottom: 10%; left: 20%;"></i>
+
+        <!-- Main Content -->
+        <div class="z-10 text-center space-y-4">
+            
+            <!-- Logo Area -->
+            <div id="logoArea" class="logo-container flex flex-col items-center">
+                <div class="bg-white text-blue-500 rounded-full w-24 h-24 flex items-center justify-center shadow-xl mb-4 border-4 border-yellow-400">
+                    <i class="fa-solid fa-child-reaching text-5xl"></i>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-bold drop-shadow-lg text-white">
+                    Anak Pintar <span class="text-yellow-300">Indonesia</span>
+                </h1>
+            </div>
+
+            <!-- Icons Row (Delays adjusted to start at 2.0s) -->
+            <div class="flex gap-6 justify-center mt-4">
+                <div class="icon-item flex flex-col items-center" style="animation-delay: 2.0s;">
+                    <i class="fa-solid fa-brain text-3xl text-pink-300 drop-shadow-md"></i>
+                    <span class="text-sm font-semibold mt-1">Logika</span>
+                </div>
+                <div class="icon-item flex flex-col items-center" style="animation-delay: 2.2s;">
+                    <i class="fa-solid fa-book-open text-3xl text-green-300 drop-shadow-md"></i>
+                    <span class="text-sm font-semibold mt-1">Literasi</span>
+                </div>
+                <div class="icon-item flex flex-col items-center" style="animation-delay: 2.4s;">
+                    <i class="fa-solid fa-lightbulb text-3xl text-yellow-300 drop-shadow-md"></i>
+                    <span class="text-sm font-semibold mt-1">Ide</span>
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <div id="taglineArea" class="tagline mt-6 bg-white/20 backdrop-blur-sm px-6 py-2 rounded-full border border-white/30">
+                <p class="text-lg md:text-2xl font-bold tracking-wide">
+                    Cerdas. Kreatif. Menyenangkan.
+                </p>
+            </div>
+
+            <!-- CTA -->
+            <div id="ctaArea" class="cta-btn mt-6">
+                <button class="bg-red-500 text-white px-8 py-2 rounded-full font-bold shadow-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 transition-all flex items-center gap-2 mx-auto">
+                    <i class="fa-brands fa-youtube"></i> Subscribe Sekarang!
+                </button>
+            </div>
+        </div>
+
+        <!-- Sparkles (Delays adjusted to start at 6.0s) -->
+        <div class="sparkle" style="top: 20%; left: 30%; animation-delay: 6.0s;"></div>
+        <div class="sparkle" style="top: 60%; right: 25%; animation-delay: 6.2s; background: #fff;"></div>
+        <div class="sparkle" style="bottom: 30%; left: 40%; animation-delay: 6.4s; background: #81D4FA;"></div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar"></div>
+
+    </div>
+
+    <script>
+        // Updated Duration to 8 Seconds
+        const VIDEO_DURATION = 8000;
+        let isPlaying = false;
+
+        function startVideo() {
+            if (isPlaying) return;
+            isPlaying = true;
+
+            // Hide overlays
+            document.getElementById('startOverlay').classList.add('hidden');
+            document.getElementById('replayOverlay').classList.add('hidden');
+
+            // Reset Elements
+            resetAnimations();
+
+            // Start Audio Sequence
+            playAudioSequence();
+
+            // Handle Progress & End
+            setTimeout(() => {
+                document.getElementById('replayOverlay').classList.remove('hidden');
+                isPlaying = false;
+            }, VIDEO_DURATION);
+        }
+
+        function resetAnimations() {
+            const elements = [
+                { id: 'logoArea', cls: 'animate-logo' },
+                { id: 'taglineArea', cls: 'animate-tagline' },
+                { id: 'ctaArea', cls: 'animate-cta' },
+                { id: 'progressBar', cls: 'animate-progress' }
+            ];
+
+            const icons = document.querySelectorAll('.icon-item');
+            icons.forEach(icon => icon.classList.remove('animate-icon'));
+            
+            const sparkles = document.querySelectorAll('.sparkle');
+            sparkles.forEach(s => s.classList.remove('animate-sparkle'));
+
+            elements.forEach(el => {
+                const node = document.getElementById(el.id);
+                node.classList.remove(el.cls);
+                void node.offsetWidth; 
+                node.classList.add(el.cls);
+            });
+
+            icons.forEach(icon => {
+                void icon.offsetWidth;
+                icon.classList.add('animate-icon');
+            });
+
+            sparkles.forEach(s => {
+                void s.offsetWidth;
+                s.classList.add('animate-sparkle');
+            });
+        }
+
+        // --- Text to Speech Logic (Updated Timings) ---
+        function playAudioSequence() {
+            window.speechSynthesis.cancel();
+
+            // 0.5s: Main Title
+            setTimeout(() => speak("Anak Pintar Indonesia!", 1.4, 1.1), 500);
+
+            // 3.0s: Tagline (Matches the updated CSS delay)
+            setTimeout(() => speak("Cerdas, Kreatif, Menyenangkan!", 1.4, 1.1), 3000);
+
+            // 6.0s: CTA (Matches the updated CSS delay)
+            setTimeout(() => speak("Subscribe, sekarang ya!", 1.5, 1.2), 6000);
+        }
+
+        function speak(text, pitch = 1.0, rate = 1.0) {
+            if (!window.speechSynthesis) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            const voices = window.speechSynthesis.getVoices();
+            const idVoice = voices.find(v => v.lang.includes('id') || v.lang.includes('ID'));
+            
+            if (idVoice) utterance.voice = idVoice;
+            else utterance.lang = 'id-ID'; 
+
+            utterance.pitch = pitch; 
+            utterance.rate = rate;   
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        window.speechSynthesis.getVoices();
+    </script>
+</body>
+</html>
