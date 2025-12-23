@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Literasi Puasa Ramadhan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        
+        /* Animasi Hujan Bunga */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        .flower-drop {
+            position: absolute;
+            top: -50px;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* Animasi Fade In */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Animasi Karakter */
+        @keyframes breathe {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        @keyframes wave {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(15deg); }
+        }
+        
+        .char-breathe { animation: breathe 3s ease-in-out infinite; }
+        .eye-blink { transform-origin: center; animation: blink 4s infinite; }
+        .hand-wave { transform-origin: 135px 105px; animation: wave 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-blue-100 min-h-screen flex flex-col items-center text-gray-800 overflow-x-hidden">
+
+    <!-- Container Utama -->
+    <div id="app" class="w-full max-w-6xl p-4 flex-1 flex flex-col items-center">
+        <!-- Konten akan dirender di sini oleh JavaScript -->
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA SOAL (10 Soal Literasi: Puasa Ramadhan) ---
+        // Materi: Pengertian, Waktu, Sahur/Buka, Niat, Batal, Perilaku, Ibadah, Keutamaan.
+        const allQuestions = [
+            { 
+                question: "Matahari bersinar terik. Perut Ahmad berbunyi kriuk-kriuk minta diisi. Tapi Ahmad ingat ia sedang puasa karena Allah. Apa yang Ahmad lakukan?", 
+                choices: ["Diam-diam makan roti", "Menahan diri tidak makan sampai Maghrib", "Minum air es sedikit"], 
+                correct: 1 
+            },
+            { 
+                question: "Jam dinding menunjukkan pukul 04.00 pagi. Langit masih gelap dan Azan Subuh belum terdengar. Ibu membangunkan Kakak untuk makan. Makan di waktu ini disebut...", 
+                choices: ["Sarapan Pagi", "Makan Siang", "Makan Sahur"], 
+                correct: 2 
+            },
+            { 
+                question: "Terdengar suara bedug 'Dug... dug... dug...' lalu Azan Maghrib berkumandang. Matahari sudah tenggelam. Apa yang boleh dilakukan orang yang berpuasa?", 
+                choices: ["Lanjut puasa sampai malam", "Segera Berbuka Puasa", "Tidur saja"], 
+                correct: 1 
+            },
+            { 
+                question: "Di meja makan ada sirup, gorengan, dan kurma. Ayah ingin meniru kebiasaan Nabi Muhammad SAW saat berbuka. Apa yang Ayah makan duluan?", 
+                choices: ["Gorengan pedas", "Nasi Padang", "Buah Kurma"], 
+                correct: 2 
+            },
+            { 
+                question: "Doni sedang berpuasa. Tiba-tiba temannya mengejek Doni. Doni ingin sekali marah, tapi ia ingat pesan guru. Sikap Doni sebaiknya...", 
+                choices: ["Memukul temannya", "Menangis keras", "Sabar dan memaafkan"], 
+                correct: 2 
+            },
+            { 
+                question: "Siti belum dewasa (belum balig). Siti ingin belajar puasa tetapi tidak kuat sampai sore. Siti berbuka saat Azan Zuhur. Apakah boleh?", 
+                choices: ["Boleh, namanya puasa latihan", "Tidak boleh, berdosa", "Harus dihukum"], 
+                correct: 0 
+            },
+            { 
+                question: "Andi sedang sikat gigi tapi sengaja menelan air kumur-kumur karena haus. Bagaimana hukum puasa Andi?", 
+                choices: ["Puasanya Batal", "Puasanya Sah", "Pahala bertambah"], 
+                correct: 0 
+            },
+            { 
+                question: "Malam hari di bulan Ramadhan, masjid terlihat ramai sekali setelah shalat Isya. Orang-orang melaksanakan shalat sunnah berjamaah. Shalat apakah itu?", 
+                choices: ["Shalat Jumat", "Shalat Tarawih", "Shalat Dhuha"], 
+                correct: 1 
+            },
+            { 
+                question: "Sebelum tidur malam, Rara berbisik dalam hati: 'Ya Allah, besok saya niat berpuasa Ramadhan karena-Mu'. Perbuatan Rara ini disebut...", 
+                choices: ["Niat Puasa", "Mimpi Puasa", "Batal Puasa"], 
+                correct: 0 
+            },
+            { 
+                question: "Budi berhasil puasa sebulan penuh. Ia jadi rajin shalat dan tidak mudah marah. Berarti puasa melatih Budi menjadi anak yang...", 
+                choices: ["Pemalas", "Sabar dan Disiplin", "Suka jajan"], 
+                correct: 1 
+            }
+        ];
+
+        // --- STATE VARIABLES ---
+        let gameState = 'start'; // start, playing, result
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timePercent = 100;
+        let isSpeaking = false;
+        let timerInterval = null;
+        let isFeedbackShowing = false;
+        
+        let currentUtterance = null;
+        
+        const app = document.getElementById('app');
+
+        // --- SVG CHARACTER (ANAK MUSLIM - TEMA BIRU) ---
+        function getMuslimBoySVG() {
+            return `
+            <svg viewBox="0 0 200 300" class="w-full h-auto char-breathe drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(0, 20)">
+                    <path d="M70 240 L70 290 A 5 5 0 0 0 85 295 L115 295 A 5 5 0 0 0 130 290 L130 240 Z" fill="#374151" />
+                    <path d="M60 180 L140 180 L145 250 L55 250 Z" fill="#1E40AF" stroke="#1E3A8A" stroke-width="2"/>
+                    <path d="M60 200 L140 200 M58 220 L142 220 M56 240 L144 240" stroke="#60A5FA" stroke-width="1" opacity="0.3"/>
+                    <path d="M80 180 L75 250 M100 180 L100 250 M120 180 L125 250" stroke="#60A5FA" stroke-width="1" opacity="0.3"/>
+                    <path d="M65 100 Q100 90 135 100 L140 190 Q100 200 60 190 Z" fill="#EFF6FF" stroke="#DBEAFE" stroke-width="2"/>
+                    <circle cx="100" cy="130" r="3" fill="#93C5FD"/>
+                    <circle cx="100" cy="150" r="3" fill="#93C5FD"/>
+                    <circle cx="100" cy="170" r="3" fill="#93C5FD"/>
+                    <path d="M115 130 L130 130 L130 145 Q122.5 150 115 145 Z" fill="#DBEAFE"/>
+                    <path d="M65 105 Q45 140 50 170" fill="none" stroke="#EFF6FF" stroke-width="20" stroke-linecap="round"/>
+                    <circle cx="50" cy="170" r="10" fill="#fce5cd"/>
+                    <g class="hand-wave">
+                        <path d="M135 105 Q160 130 165 100" fill="none" stroke="#EFF6FF" stroke-width="20" stroke-linecap="round"/>
+                        <circle cx="165" cy="100" r="10" fill="#fce5cd"/>
+                    </g>
+                    <rect x="85" y="90" width="30" height="20" fill="#fce5cd"/>
+                    <ellipse cx="100" cy="70" rx="40" ry="45" fill="#fce5cd"/>
+                    <circle cx="58" cy="75" r="7" fill="#fce5cd"/>
+                    <circle cx="142" cy="75" r="7" fill="#fce5cd"/>
+                    <path d="M55 50 Q100 25 145 50 L145 40 Q100 15 55 40 Z" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+                    <rect x="55" y="50" width="90" height="15" fill="#FFFFFF" rx="2" stroke="#E5E7EB" stroke-width="1"/>
+                    <g class="eye-blink">
+                        <ellipse cx="82" cy="70" rx="5" ry="7" fill="#1F2937"/>
+                        <circle cx="83" cy="68" r="2" fill="white"/> 
+                        <ellipse cx="118" cy="70" rx="5" ry="7" fill="#1F2937"/>
+                        <circle cx="119" cy="68" r="2" fill="white"/> 
+                    </g>
+                    <path d="M75 60 Q82 56 89 60" fill="none" stroke="#1F2937" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M111 60 Q118 56 125 60" fill="none" stroke="#1F2937" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M85 90 Q100 105 115 90" fill="none" stroke="#B91C1C" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="75" cy="85" r="6" fill="#FCA5A5" opacity="0.4"/>
+                    <circle cx="125" cy="85" r="6" fill="#FCA5A5" opacity="0.4"/>
+                </g>
+            </svg>
+            `;
+        }
+
+        // --- TTS FUNCTION (ROBUST FIX) ---
+        function speakText(text, onEndCallback) {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            setTimeout(() => {
+                const textToSpeak = text
+                    .replace(/SWT/g, "Subhanahu wa ta'ala")
+                    .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam")
+                    .replace(/RA/g, "Radhiallahu 'anhu"); 
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID'; 
+                utterance.rate = 0.9; 
+                utterance.pitch = 1.1; 
+                
+                currentUtterance = utterance;
+
+                let hasCalledBack = false;
+
+                const done = () => {
+                    if (hasCalledBack) return;
+                    hasCalledBack = true;
+                    isSpeaking = false;
+                    updateStatusText();
+                    if (onEndCallback) onEndCallback();
+                };
+
+                const estimatedDuration = (textToSpeak.length * 100) + 3000;
+                const safetyTimer = setTimeout(() => {
+                    if (isSpeaking) {
+                        console.warn("TTS Timeout - Proceeding");
+                        window.speechSynthesis.cancel();
+                        done();
+                    }
+                }, estimatedDuration);
+                
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    updateStatusText();
+                };
+                
+                utterance.onend = () => {
+                    clearTimeout(safetyTimer);
+                    done();
+                };
+
+                utterance.onerror = (e) => {
+                    clearTimeout(safetyTimer);
+                    if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                        console.warn("TTS Issue (Auto-resolved):", e.error || "Unknown");
+                    }
+                    done();
+                };
+
+                try {
+                    window.speechSynthesis.speak(utterance);
+                } catch (err) {
+                    console.warn("TTS Speak Error:", err);
+                    done();
+                }
+            }, 50);
+        }
+
+        // --- LOGIC FUNCTIONS ---
+
+        function startQuiz() {
+            gameState = 'playing';
+            score = 0;
+            currentQuestionIndex = 0;
+            renderQuiz();
+            playQuestion();
+        }
+
+        function playQuestion() {
+            if(gameState !== 'playing') return;
+            
+            timePercent = 100;
+            updateTimerUI();
+            
+            const q = allQuestions[currentQuestionIndex];
+            const text = `${q.question}. A. ${q.choices[0]}. B. ${q.choices[1]}. C. ${q.choices[2]}.`;
+            
+            clearInterval(timerInterval);
+            
+            speakText(text, () => {
+                if(gameState === 'playing' && !isFeedbackShowing) {
+                    startTimer();
+                }
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                if(timePercent > 0) {
+                    timePercent -= 1; 
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); // Timeout Logic
+                }
+            }, 50); // 50ms Interval -> Total 5000ms (5s)
+        }
+
+        function handleAnswer(choiceIndex) {
+            if(isFeedbackShowing) return;
+            
+            window.speechSynthesis.cancel();
+            clearInterval(timerInterval);
+            isSpeaking = false;
+            isFeedbackShowing = true;
+
+            const isCorrect = choiceIndex === allQuestions[currentQuestionIndex].correct;
+            const isTimeout = choiceIndex === -1;
+
+            if(isCorrect) score += 10;
+
+            const appreciationMessages = [
+                "Masya Allah, Hebat sekali!",
+                "Luar biasa! Jawabanmu benar.",
+                "Pintar! Kamu anak cerdas.",
+                "Alhamdulillah, tepat sekali!",
+                "Keren! Pertahankan semangatmu.",
+                "Wow, kamu benar-benar paham!",
+                "Benar! Kamu makin pintar.",
+                "Seratus buat kamu! Lanjutkan."
+            ];
+
+            let feedbackTitle = "";
+            let feedbackText = "";
+            let speechText = "";
+
+            if (isCorrect) {
+                const randomMsg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+                feedbackTitle = "BENAR!";
+                feedbackText = randomMsg;
+                speechText = randomMsg;
+            } else if (isTimeout) {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "JAWABAN YANG BENAR";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-blue-600 block mt-2">${correctAns}</span>`;
+                speechText = `Jawabannya adalah ${correctAns}.`;
+            } else {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "YAH, SALAH...";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-blue-600 block mt-2">${correctAns}</span>`;
+                speechText = "Jawaban kurang tepat. Jangan menyerah!";
+            }
+
+            renderFeedback(isCorrect, isTimeout, feedbackTitle, feedbackText);
+            speakText(speechText);
+
+            setTimeout(() => {
+                isFeedbackShowing = false;
+                removeFeedback();
+                
+                if (currentQuestionIndex < allQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuiz();
+                    playQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 4000); 
+        }
+
+        function finishQuiz() {
+            gameState = 'result';
+            renderResult();
+            speakText("Alhamdulillah kuis selesai. Mari lihat nilaimu!");
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function updateStatusText() {
+            const el = document.getElementById('status-text');
+            if(el) {
+                el.innerText = isSpeaking ? "" : "Siap-siap...";
+            }
+        }
+
+        function updateTimerUI() {
+            const barEl = document.getElementById('timer-bar');
+            
+            if(!barEl) return;
+
+            barEl.style.width = `${timePercent}%`;
+            
+            // Warna Bar
+            if (timePercent > 50) {
+                barEl.className = "h-full bg-green-500 transition-all duration-75 ease-linear rounded-full";
+            } else if (timePercent > 20) {
+                barEl.className = "h-full bg-yellow-400 transition-all duration-75 ease-linear rounded-full";
+            } else {
+                barEl.className = "h-full bg-red-600 transition-all duration-75 ease-linear rounded-full animate-pulse";
+            }
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen font-sans text-center w-full">
+                    <div class="bg-gradient-to-b from-blue-400 to-indigo-600 fixed inset-0 z-[-1]"></div>
+                    <div class="mb-6 animate-bounce text-yellow-300">
+                        <i data-lucide="sun" width="80" height="80" fill="currentColor"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-md text-yellow-300">
+                        Kuis Literasi Puasa
+                    </h1>
+                    <p class="text-xl mb-6 bg-white/20 text-white p-4 rounded-xl backdrop-blur-sm">
+                        Cerita & Soal Ramadhan <br/> (Untuk Kelas 1 - 3 SD)
+                    </p>
+                    <button onclick="startQuiz()" class="flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-indigo-900 font-bold py-4 px-12 rounded-full text-2xl shadow-lg transform transition hover:scale-105 active:scale-95">
+                        <i data-lucide="play" fill="currentColor"></i>
+                        MULAI KUIS
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderQuiz() {
+            const q = allQuestions[currentQuestionIndex];
+            
+            app.innerHTML = `
+                <!-- Header -->
+                <div class="w-full flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-4">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                            ${currentQuestionIndex + 1}
+                        </div>
+                        <span class="text-gray-500 font-medium">/ ${allQuestions.length}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border border-yellow-300">
+                        <i data-lucide="star" class="text-yellow-500 fill-current" width="20"></i>
+                        <span class="font-bold text-yellow-700">${score}</span>
+                    </div>
+                </div>
+
+                <!-- MAIN LAYOUT: FLEX (Kiri: Soal, Kanan: Karakter) -->
+                <div class="w-full flex flex-col lg:flex-row gap-6 items-stretch">
+                    
+                    <!-- KOLOM KIRI: SOAL & JAWABAN (Flexible Width) -->
+                    <div class="flex-1 flex flex-col w-full">
+                        
+                        <!-- Question Area (UPDATED COLOR) -->
+                        <div class="w-full bg-yellow-50 rounded-3xl shadow-xl overflow-hidden mb-4 relative border-4 border-yellow-100">
+                            <button onclick="playQuestion()" class="absolute top-4 right-4 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 p-3 rounded-full transition-all">
+                                <i data-lucide="volume-2" width="32"></i>
+                            </button>
+                            <div class="p-8 pt-16 text-center">
+                                <h3 class="text-2xl md:text-3xl font-bold text-blue-900 leading-snug">
+                                    ${q.question}
+                                </h3>
+                                <p id="status-text" class="mt-4 text-sm text-gray-500 italic min-h-[20px]"></p>
+                            </div>
+                        </div>
+
+                        <!-- TIMER BAR (DI TENGAH) -->
+                        <div class="w-full mb-4 bg-gray-200 rounded-full h-12 border-4 border-white shadow-md overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-500 z-10 tracking-widest uppercase">Waktu</div>
+                            <div id="timer-bar" class="h-full bg-green-500 transition-all duration-75 ease-linear rounded-full" style="width: 100%;"></div>
+                        </div>
+
+                        <!-- Answers Grid (FULL WIDTH) -->
+                        <div class="w-full grid gap-4">
+                            ${q.choices.map((choice, idx) => {
+                                const labels = ["A", "B", "C"];
+                                return `
+                                    <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 bg-white hover:bg-blue-50 border-blue-200 hover:border-blue-400 shadow-md hover:shadow-lg">
+                                        <div class="bg-blue-500 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-blue-600 transition shrink-0">
+                                            ${labels[idx]}
+                                        </div>
+                                        <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight w-full">${choice}</span>
+                                    </button>
+                                `
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- KOLOM KANAN: KARAKTER (Hanya di Desktop/Landscape Lebar) -->
+                    <div class="hidden lg:flex flex-col items-center justify-end w-64 shrink-0 relative">
+                        <!-- Balon Kata -->
+                        <div class="mb-4 bg-white p-4 rounded-xl rounded-bl-none shadow-lg border-2 border-blue-200 animate-bounce">
+                            <p class="text-blue-700 font-bold text-center">Semangat Belajarnya!</p>
+                        </div>
+                        <!-- SVG Karakter -->
+                        ${getMuslimBoySVG()}
+                    </div>
+
+                </div>
+            `;
+            lucide.createIcons();
+            // Initial call
+            updateTimerUI(); 
+        }
+
+        function renderFeedback(isCorrect, isTimeout, title, textContent) {
+            const overlay = document.createElement('div');
+            overlay.id = 'feedback-overlay';
+            overlay.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm fade-in';
+            
+            let content = '';
+            if (isCorrect) {
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-green-500">
+                        <div class="mx-auto mb-4 text-green-500"><i data-lucide="check-circle" width="80" height="80"></i></div>
+                        <h2 class="text-4xl font-black text-green-600">${title}</h2>
+                        <p class="text-gray-500 mt-2 text-xl font-bold">${textContent}</p>
+                    </div>
+                `;
+            } else {
+                let iconHtml = '';
+                if (!isTimeout) {
+                    iconHtml = `<div class="mx-auto mb-4 text-red-500"><i data-lucide="x-circle" width="80" height="80"></i></div>`;
+                }
+
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-red-500">
+                        ${iconHtml}
+                        <h2 class="text-2xl font-black text-red-600 uppercase tracking-wide">${title}</h2>
+                        <p class="text-gray-500 mt-2">
+                        ${textContent}
+                        </p>
+                    </div>
+                `;
+            }
+
+            overlay.innerHTML = content;
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+
+        function removeFeedback() {
+            const el = document.getElementById('feedback-overlay');
+            if(el) el.remove();
+        }
+
+        function renderResult() {
+            const maxScore = allQuestions.length * 10;
+            const percentage = (score / maxScore) * 100;
+            const isHighscore = score > 90; // Logic score > 90 karena max score 100 (10 soal)
+
+            let message = "";
+            if (isHighscore) {
+                message = "Masya Allah! Kamu Pintar Sekali, Calon Anak Sholeh!";
+                startFlowerRain();
+            } else if (percentage > 70) {
+                message = "Alhamdulillah! Nilaimu Bagus Sekali!";
+            } else {
+                message = "Jangan menyerah, ayo belajar lagi ya!";
+            }
+
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen text-white text-center relative overflow-hidden">
+                    <div class="bg-gradient-to-b from-blue-500 to-indigo-600 fixed inset-0 z-[-1]"></div>
+                    
+                    <div class="z-10 mb-6 text-yellow-300 drop-shadow-lg">
+                         <i data-lucide="trophy" width="100" height="100"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold mb-2 z-10">Nilai Akhir</h2>
+                    <div class="text-7xl font-black mb-4 text-yellow-100 drop-shadow-md z-10">
+                        ${score}
+                    </div>
+                    <p class="text-lg mb-8 z-10">
+                        Dari Total ${maxScore} Poin
+                    </p>
+                    
+                    <p class="text-xl mb-8 font-bold bg-white/20 p-4 rounded-xl z-10 max-w-lg leading-relaxed">
+                        ${message}
+                    </p>
+                    
+                    <button onclick="location.reload()" class="flex items-center gap-2 bg-white text-indigo-600 font-bold py-3 px-8 rounded-full text-xl shadow-lg hover:bg-gray-100 transition z-10 cursor-pointer">
+                        <i data-lucide="refresh-ccw" width="24"></i>
+                        Main Lagi
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function startFlowerRain() {
+            const emojis = ['🌸', '🌺', '🌹', '🌻', '🌷', '💐'];
+            for(let i=0; i<50; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'flower-drop text-4xl';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (3 + Math.random() * 4) + 's';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+            }
+        }
+
+        // --- INIT ---
+        renderStart();
+
+    </script>
+</body>
+</html>
