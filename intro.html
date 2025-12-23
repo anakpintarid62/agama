@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thumbnail Generator - Kuis Nabi Muhammad SAW</title>
-    <!-- Google Fonts: Bangers (Komik/Seru) & Fredoka One (Bulat/Anak) -->
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka+One&display=swap" rel="stylesheet">
+    <title>Thumbnail Generator - Literasi Puasa</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,14 +18,14 @@
             align-items: center;
             min-h-screen;
             background-color: #222;
-            font-family: 'Fredoka One', cursive;
+            font-family: 'Fredoka', sans-serif;
         }
 
-        /* Canvas 1280x720 (Standar YouTube) */
+        /* Canvas 1280x720 */
         .thumbnail-container {
             width: 1280px;
             height: 720px;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%); /* Emerald Green */
+            background: radial-gradient(circle at center, #7c3aed 0%, #4c1d95 100%); /* Ungu Ramadhan */
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
@@ -37,136 +37,129 @@
         }
 
         /* --- BACKGROUND EFFECTS --- */
+        /* Pola Bintang */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(white 1px, transparent 1px),
+                radial-gradient(rgba(255,255,255,0.5) 2px, transparent 2px);
+            background-size: 50px 50px, 100px 100px;
+            background-position: 0 0, 25px 25px;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Sinar Berputar */
         .sunburst {
             position: absolute;
             top: 50%; left: 50%;
-            width: 2000px; height: 2000px;
+            width: 1800px; height: 1800px;
             background: repeating-conic-gradient(
                 from 0deg,
-                rgba(255, 255, 255, 0.05) 0deg 15deg,
-                transparent 15deg 30deg
+                rgba(255, 255, 255, 0.05) 0deg 20deg,
+                transparent 20deg 40deg
             );
             transform: translate(-50%, -50%);
-            animation: spin 60s linear infinite;
-            z-index: 0;
-        }
-        @keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-        .sparkles {
-            position: absolute;
-            width: 100%; height: 100%;
-            background-image: radial-gradient(white 2px, transparent 2px);
-            background-size: 50px 50px;
-            opacity: 0.2;
+            animation: spin 80s linear infinite;
             z-index: 1;
         }
+        @keyframes spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 
         /* --- CONTENT LAYER --- */
         .content {
             z-index: 10;
             text-align: center;
             position: relative;
-            margin-top: -20px;
+            transform: translateY(-30px);
         }
 
-        /* Badge Atas */
-        .top-badge {
-            background-color: #fff;
-            color: #047857;
-            padding: 10px 30px;
+        /* Top Tag */
+        .top-tag {
+            background-color: #FCD34D; /* Kuning */
+            color: #7c3aed; /* Ungu Teks */
+            padding: 10px 35px;
             font-size: 2rem;
             border-radius: 50px;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.2);
-            margin-bottom: 15px;
-            transform: rotate(-2deg);
+            gap: 15px;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+            transform: rotate(-3deg);
+            border: 4px solid #fff;
         }
 
         /* Judul Utama */
-        .title-group {
-            position: relative;
-        }
-
         .main-title {
-            font-family: 'Bangers', cursive;
-            font-size: 7rem;
-            line-height: 0.9;
-            color: #FFEB3B; /* Kuning Emas */
-            text-shadow: 6px 6px 0px #d97706; /* Shadow Oranye */
-            -webkit-text-stroke: 4px #78350f; /* Stroke Coklat Tua */
-            transform: rotate(-3deg);
-            margin-bottom: 0px;
-            z-index: 2;
-            position: relative;
-        }
-
-        .sub-title {
             font-family: 'Bangers', cursive;
             font-size: 8rem;
             line-height: 0.9;
             color: #fff;
-            text-shadow: 6px 6px 0px #064e3b;
-            -webkit-text-stroke: 5px #064e3b; /* Stroke Hijau Gelap */
-            margin-top: -10px;
-            position: relative;
-            z-index: 3;
+            text-shadow: 4px 4px 0px #5b21b6;
+            -webkit-text-stroke: 3px #5b21b6;
+            margin-bottom: 0;
+            margin-top: 10px;
+        }
+
+        .highlight-title {
+            font-family: 'Bangers', cursive;
+            font-size: 9rem;
+            line-height: 0.9;
+            color: #6EE7B7; /* Hijau Mint Cerah */
+            text-shadow: 6px 6px 0px #065f46;
+            -webkit-text-stroke: 4px #065f46;
+            display: block;
             transform: rotate(2deg);
+            margin-top: -10px;
         }
 
-        .sub-title span {
-            color: #a7f3d0;
-        }
-
-        /* --- VISUAL ELEMENTS --- */
-        /* Ilustrasi Masjid (SVG Inline) */
-        .mosque-icon {
+        /* --- ILLUSTRATIONS --- */
+        
+        /* Lentera Gantung */
+        .lantern {
             position: absolute;
-            left: 40px;
+            top: -20px;
+            z-index: 5;
+            filter: drop-shadow(0 0 15px rgba(252, 211, 77, 0.6));
+            animation: swing 3s ease-in-out infinite alternate;
+        }
+        .lantern-left { left: 80px; width: 100px; animation-delay: 0s; }
+        .lantern-right { right: 80px; width: 120px; animation-delay: 1s; }
+
+        @keyframes swing { from { transform: rotate(-5deg); } to { transform: rotate(5deg); } }
+
+        /* Buku Terbuka (Bawah Kiri) */
+        .book-icon {
+            position: absolute;
             bottom: 40px;
-            width: 320px;
+            left: 50px;
+            width: 280px;
             filter: drop-shadow(5px 5px 0 rgba(0,0,0,0.3));
-            z-index: 5;
-            animation: float 3s ease-in-out infinite;
+            z-index: 10;
+            transform: rotate(-10deg);
         }
 
-        /* Ilustrasi Skor/Badge Kanan */
-        .score-badge {
+        /* Ilustrasi Bedug & Pemukul (Bawah Kanan) */
+        .bedug-icon {
             position: absolute;
-            right: 60px;
-            top: 50%;
-            transform: translateY(-50%) rotate(10deg);
-            width: 250px;
-            height: 250px;
-            background: #f59e0b;
-            border: 8px solid #fff;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            box-shadow: 10px 10px 0 rgba(0,0,0,0.2);
-            z-index: 5;
-            animation: pulse 2s infinite;
+            bottom: 30px;
+            right: 50px;
+            width: 350px;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.3));
+            z-index: 10;
+            transform: rotate(-5deg);
         }
 
-        .score-badge h3 { font-size: 6rem; line-height: 1; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
-        .score-badge p { font-size: 2rem; }
-
-        /* Awan Bawah */
-        .cloud-bottom {
-            position: absolute;
-            bottom: -80px;
-            left: 0;
-            width: 100%;
-            z-index: 4;
+        /* Animasi Pukul Bedug */
+        @keyframes hit {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(-25deg); }
         }
-
-        /* Animasi */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-        @keyframes pulse { 0%, 100% { transform: translateY(-50%) rotate(10deg) scale(1); } 50% { transform: translateY(-50%) rotate(10deg) scale(1.05); } }
+        .stick-arm {
+            transform-origin: 220px 100px; /* Titik putar di bahu/tangan */
+            animation: hit 0.8s ease-in-out infinite;
+        }
 
         /* Helper Text */
         .download-hint {
@@ -174,57 +167,100 @@
             padding: 15px; border-radius: 10px; font-family: sans-serif; font-size: 1rem;
             z-index: 100; text-align: center;
         }
+
     </style>
 </head>
 <body>
 
     <div class="thumbnail-container">
-        <!-- Efek Latar -->
+        <!-- Latar -->
+        <div class="stars"></div>
         <div class="sunburst"></div>
-        <div class="sparkles"></div>
 
-        <!-- Konten Tengah -->
-        <div class="content">
-            <div class="top-badge">
-                <i class="fas fa-star text-yellow-400"></i>
-                EDISI SPESIAL ANAK
-                <i class="fas fa-star text-yellow-400"></i>
-            </div>
-
-            <div class="title-group">
-                <h1 class="main-title">CERDAS CERMAT</h1>
-                <h2 class="sub-title">NABI MUHAMMAD <br> <span>SAW</span></h2>
-            </div>
-        </div>
-
-        <!-- Ilustrasi Masjid (Kiri) -->
-        <svg class="mosque-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-            <!-- Dome (Sekarang Warna Emas & Tanpa Tanda +) -->
-            <path d="M256 64C185.3 64 128 121.3 128 192H384C384 121.3 326.7 64 256 64Z" fill="#FFD700"/>
-            
-            <!-- Base -->
-            <rect x="96" y="192" width="320" height="200" rx="10" fill="#F3F4F6"/>
-            <!-- Door -->
-            <path d="M224 392H288V280C288 262.3 273.7 248 256 248C238.3 248 224 262.3 224 280V392Z" fill="#059669"/>
-            <!-- Minarets -->
-            <rect x="64" y="160" width="32" height="232" fill="#D1D5DB"/>
-            <path d="M64 160L80 128L96 160H64Z" fill="#10B981"/>
-            <rect x="416" y="160" width="32" height="232" fill="#D1D5DB"/>
-            <path d="M416 160L432 128L448 160H416Z" fill="#10B981"/>
+        <!-- Dekorasi Lentera -->
+        <svg class="lantern lantern-left" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+            <line x1="50" y1="0" x2="50" y2="40" stroke="#FBBF24" stroke-width="4"/>
+            <path d="M20 40 L80 40 L90 70 L10 70 Z" fill="#F59E0B"/>
+            <rect x="20" y="70" width="60" height="80" fill="#FEF3C7" stroke="#F59E0B" stroke-width="4"/>
+            <path d="M20 150 L80 150 L70 170 L30 170 Z" fill="#F59E0B"/>
+            <circle cx="50" cy="110" r="10" fill="#FCD34D" filter="blur(5px)"/>
+        </svg>
+        
+        <svg class="lantern lantern-right" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+            <line x1="50" y1="0" x2="50" y2="30" stroke="#FBBF24" stroke-width="4"/>
+            <path d="M20 30 L80 30 L90 60 L10 60 Z" fill="#F59E0B"/>
+            <rect x="20" y="60" width="60" height="80" fill="#FEF3C7" stroke="#F59E0B" stroke-width="4"/>
+            <path d="M20 140 L80 140 L70 160 L30 160 Z" fill="#F59E0B"/>
+            <circle cx="50" cy="100" r="12" fill="#FCD34D" filter="blur(6px)"/>
         </svg>
 
-        <!-- Badge Kanan -->
-        <div class="score-badge">
-            <h3>40</h3>
-            <p>SOAL SERU!</p>
+        <!-- Konten Utama -->
+        <div class="content">
+            <div class="top-tag">
+                <i class="fas fa-star"></i>
+                KUIS CERIA
+            </div>
+
+            <h1 class="main-title">PUASA</h1>
+            <h1 class="highlight-title">RAMADHAN</h1>
         </div>
 
-        <!-- Awan -->
-        <div class="cloud-bottom">
-            <svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg">
-                <path fill="#ffffff" fill-opacity="1" d="M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,112C672,107,768,149,864,165.3C960,181,1056,171,1152,149.3C1248,128,1344,96,1392,80L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-            </svg>
-        </div>
+        <!-- Ilustrasi Buku (Kiri) -->
+        <svg class="book-icon" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 120 L10 30 Q50 40 100 30 Q150 40 190 30 L190 120 Q150 130 100 120 Q50 130 10 120 Z" fill="#3B82F6"/>
+            <path d="M15 115 L15 25 Q50 35 100 25 Q150 35 185 25 L185 115 Q150 125 100 115 Q50 125 15 115 Z" fill="#FFF"/>
+            <path d="M100 25 L100 115" stroke="#E5E7EB" stroke-width="2"/>
+            <line x1="25" y1="40" x2="90" y2="40" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+            <line x1="25" y1="50" x2="80" y2="50" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+            <line x1="110" y1="40" x2="175" y2="40" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+            <line x1="110" y1="50" x2="160" y2="50" stroke="#9CA3AF" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+
+        <!-- Ilustrasi Bedug & Pemukul (Kanan) -->
+        <svg class="bedug-icon" viewBox="0 0 350 300" xmlns="http://www.w3.org/2000/svg">
+            <!-- Kaki Penyangga Bedug -->
+            <path d="M50 200 L30 280 L50 280 L70 200 Z" fill="#5D4037"/> <!-- Kaki Belakang Kiri -->
+            <path d="M200 200 L220 280 L240 280 L220 200 Z" fill="#5D4037"/> <!-- Kaki Belakang Kanan -->
+            
+            <!-- Tali Penggantung -->
+            <path d="M50 100 L50 200" stroke="#3E2723" stroke-width="5"/>
+            <path d="M220 100 L220 200" stroke="#3E2723" stroke-width="5"/>
+
+            <!-- Badan Bedug (Tabung) -->
+            <path d="M50 100 L220 100 L220 200 L50 200 Z" fill="#8D6E63"/> <!-- Kayu Gelap -->
+            <rect x="50" y="100" width="170" height="100" fill="#A1887F"/> <!-- Kayu Terang -->
+            
+            <!-- Paku Bedug -->
+            <circle cx="60" cy="110" r="3" fill="#3E2723"/> <circle cx="60" cy="190" r="3" fill="#3E2723"/>
+            <circle cx="210" cy="110" r="3" fill="#3E2723"/> <circle cx="210" cy="190" r="3" fill="#3E2723"/>
+
+            <!-- Sisi Bedug (Kulit) -->
+            <ellipse cx="50" cy="150" rx="20" ry="50" fill="#5D4037"/> <!-- Sisi Belakang -->
+            <ellipse cx="220" cy="150" rx="20" ry="50" fill="#FFF8E1" stroke="#8D6E63" stroke-width="3"/> <!-- Sisi Depan (Kulit) -->
+
+            <!-- Orang Pemukul (Kartun Simpel) -->
+            <g transform="translate(230, 80)">
+                <!-- Badan -->
+                <path d="M20 70 L20 150 L60 150 L60 70 Z" fill="#10B981"/> <!-- Baju Hijau -->
+                <!-- Kepala -->
+                <circle cx="40" cy="40" r="25" fill="#fce5cd"/>
+                <!-- Peci -->
+                <path d="M15 30 Q40 10 65 30 L65 20 Q40 0 15 20 Z" fill="#1F2937"/>
+                <!-- Wajah -->
+                <circle cx="30" cy="35" r="3" fill="#1F2937"/> <!-- Mata -->
+                <circle cx="50" cy="35" r="3" fill="#1F2937"/> <!-- Mata -->
+                <path d="M30 50 Q40 55 50 50" fill="none" stroke="#B91C1C" stroke-width="2"/> <!-- Senyum -->
+
+                <!-- Tangan & Pemukul (Animasi) -->
+                <g class="stick-arm">
+                    <!-- Lengan -->
+                    <line x1="10" y1="80" x2="-30" y2="60" stroke="#fce5cd" stroke-width="12" stroke-linecap="round"/>
+                    <!-- Pemukul -->
+                    <line x1="-30" y1="60" x2="-60" y2="90" stroke="#5D4037" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="-60" cy="90" r="8" fill="#8D6E63"/> <!-- Ujung Pemukul -->
+                </g>
+            </g>
+        </svg>
 
     </div>
 
