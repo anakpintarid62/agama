@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Cerdas Cermat Nabi Muhammad SAW</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        
+        /* Animasi Hujan Bunga */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        .flower-drop {
+            position: absolute;
+            top: -50px;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* Animasi Fade In */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-emerald-100 min-h-screen flex flex-col items-center text-gray-800 overflow-x-hidden">
+
+    <!-- Container Utama -->
+    <div id="app" class="w-full max-w-4xl p-4 flex-1 flex flex-col">
+        <!-- Konten akan dirender di sini oleh JavaScript -->
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA SOAL (40 Soal Nabi Muhammad SAW) ---
+        const allQuestions = [
+            // BAGIAN 1: KELAHIRAN & KELUARGA
+            { question: "Di kota manakah Nabi Muhammad SAW dilahirkan?", choices: ["Madinah", "Makkah", "Palestina"], correct: 1 },
+            { question: "Siapakah nama ayah Nabi Muhammad SAW?", choices: ["Abdullah", "Abu Thalib", "Abdul Muthalib"], correct: 0 },
+            { question: "Siapakah nama ibu Nabi Muhammad SAW yang mulia?", choices: ["Siti Hajar", "Siti Khadijah", "Siti Aminah"], correct: 2 },
+            { question: "Nabi Muhammad SAW lahir pada tahun Gajah. Mengapa disebut Tahun Gajah?", choices: ["Banyak gajah lahir", "Ada pasukan gajah menyerang Kabah", "Nabi suka gajah"], correct: 1 },
+            { question: "Siapakah kakek Nabi Muhammad SAW yang sangat menyayanginya?", choices: ["Abu Jahal", "Abdul Muthalib", "Abu Bakar"], correct: 1 },
+            { question: "Siapakah paman Nabi yang selalu melindunginya meski belum masuk Islam?", choices: ["Abu Lahab", "Abu Thalib", "Hamzah"], correct: 1 },
+            { question: "Siapakah wanita pertama yang menjadi istri Nabi Muhammad SAW?", choices: ["Aisyah RA", "Khadijah RA", "Fatimah RA"], correct: 1 },
+            { question: "Siapakah nama ibu susuan Nabi Muhammad SAW dari Bani Sa'ad?", choices: ["Halimah As-Sa'diyah", "Tsuwaibah", "Aminah"], correct: 0 },
+            { question: "Nabi Muhammad SAW berasal dari suku...", choices: ["Suku Quraisy", "Suku Aus", "Suku Khazraj"], correct: 0 },
+            { question: "Siapakah nama putri Nabi Muhammad SAW yang menjadi istri Ali bin Abi Thalib?", choices: ["Ruqayyah", "Zainab", "Fatimah Az-Zahra"], correct: 2 },
+
+            // BAGIAN 2: GELAR & SIFAT (LOGIKA)
+            { question: "Sebelum menjadi Rasul, Nabi dikenal sangat jujur sehingga diberi gelar...", choices: ["Al-Fatih", "Al-Amin", "Al-Aziz"], correct: 1 },
+            { question: "Sifat 'Siddiq' yang dimiliki Nabi Muhammad SAW artinya...", choices: ["Cerdas", "Dapat Dipercaya", "Jujur/Benar"], correct: 2 },
+            { question: "Jika Nabi memiliki sifat 'Amanah', artinya Nabi...", choices: ["Menyampaikan wahyu", "Dapat dipercaya", "Sangat Cerdas"], correct: 1 },
+            { question: "Lawan dari sifat jujur adalah bohong. Nabi mustahil bersifat bohong atau disebut...", choices: ["Kizib", "Khianat", "Kitman"], correct: 0 },
+            { question: "Nabi Muhammad SAW adalah 'Uswatun Hasanah', artinya...", choices: ["Pemimpin yang kuat", "Teladan yang baik", "Orang yang kaya"], correct: 1 },
+
+            // BAGIAN 3: WAHYU & DAKWAH
+            { question: "Wahyu pertama turun kepada Nabi Muhammad SAW di...", choices: ["Gua Hira", "Gua Tsur", "Jabal Rahmah"], correct: 0 },
+            { question: "Surah apakah yang pertama kali turun kepada Nabi Muhammad SAW?", choices: ["Al-Fatihah", "Al-Alaq (Iqra)", "Al-Baqarah"], correct: 1 },
+            { question: "Malaikat yang bertugas menyampaikan wahyu kepada Nabi Muhammad SAW adalah...", choices: ["Malaikat Jibril", "Malaikat Mikail", "Malaikat Israfil"], correct: 0 },
+            { question: "Sahabat yang menemani Nabi Muhammad SAW berhijrah ke Madinah adalah...", choices: ["Umar bin Khattab", "Ali bin Abi Thalib", "Abu Bakar Ash-Shiddiq"], correct: 2 },
+            { question: "Peristiwa perjalanan Nabi dari Masjidil Haram ke Masjidil Aqsa lalu ke Langit disebut...", choices: ["Hijrah", "Isra Mi'raj", "Haji Wada"], correct: 1 },
+            { question: "Kendaraan yang ditunggangi Nabi saat Isra Mi'raj bernama...", choices: ["Buraq", "Unta", "Kuda Putih"], correct: 0 },
+            { question: "Dalam Isra Mi'raj, Nabi menerima perintah wajib...", choices: ["Puasa", "Zakat", "Shalat 5 Waktu"], correct: 2 },
+            { question: "Kota tempat Nabi Muhammad SAW berhijrah dan membangun masjid pertama adalah...", choices: ["Makkah", "Madinah", "Taif"], correct: 1 },
+            { question: "Masjid pertama yang dibangun Nabi Muhammad SAW saat hijrah adalah...", choices: ["Masjid Nabawi", "Masjid Quba", "Masjidil Haram"], correct: 1 },
+            { question: "Perang besar pertama umat Islam melawan kafir Quraisy disebut perang...", choices: ["Perang Uhud", "Perang Badar", "Perang Khandaq"], correct: 1 },
+
+            // BAGIAN 4: SOAL CERITA & LOGIKA
+            { question: "Jika ada orang yang memusuhi kita, Nabi mengajarkan untuk...", choices: ["Membalas dendam", "Mendoakan kebaikan/Memaafkan", "Marah-marah"], correct: 1 },
+            { question: "Nabi Muhammad SAW sangat menyayangi anak yatim. Sikap kita sebaiknya...", choices: ["Mengejek mereka", "Menyantuni dan menyayangi", "Menjauhi mereka"], correct: 1 },
+            { question: "Ketika dilempari batu di kota Taif, Nabi Muhammad SAW justru...", choices: ["Mendoakan agar mereka celaka", "Mendoakan agar mereka dapat hidayah", "Menangis sedih"], correct: 1 },
+            { question: "Nabi pernah berdagang dengan sangat jujur. Apa keuntungan bersikap jujur?", choices: ["Dipercaya banyak orang", "Cepat kaya dengan curang", "Ditakuti orang"], correct: 0 },
+            { question: "Saat makan, Nabi mengajarkan kita untuk menggunakan...", choices: ["Tangan Kiri", "Tangan Kanan", "Kedua tangan"], correct: 1 },
+            { question: "Sebelum tidur, Nabi membiasakan diri untuk...", choices: ["Makan banyak", "Berwudhu dan berdoa", "Bermain"], correct: 1 },
+
+            // BAGIAN 5: TEBAK SIAPA AKU (CLUE)
+            { question: "Tebak Siapa Aku: Aku adalah paman Nabi yang sangat membenci Islam dan namanya disebut dalam Al-Quran (Al-Lahab).", choices: ["Abu Jahal", "Abu Lahab", "Abu Sofyan"], correct: 1 },
+            { question: "Tebak Siapa Aku: Aku adalah istri Nabi yang termuda dan sangat cerdas menghafal hadits.", choices: ["Khadijah RA", "Aisyah RA", "Hafsah RA"], correct: 1 },
+            { question: "Tebak Siapa Aku: Aku adalah budak berkulit hitam yang pertama kali mengumandangkan adzan.", choices: ["Bilal bin Rabah", "Zaid bin Haritsah", "Salman Al-Farisi"], correct: 0 },
+            { question: "Tebak Siapa Aku: Aku adalah sepupu Nabi yang tidur di kasur Nabi untuk mengelabui musuh saat Nabi hijrah.", choices: ["Utsman bin Affan", "Ali bin Abi Thalib", "Umar bin Khattab"], correct: 1 },
+            
+            // BAGIAN 6: WAFAT & PENUTUP
+            { question: "Di kota manakah Nabi Muhammad SAW dimakamkan?", choices: ["Makkah", "Madinah", "Yerusalem"], correct: 1 },
+            { question: "Nabi Muhammad SAW adalah 'Khatamul Anbiya', artinya...", choices: ["Nabi Pertama", "Nabi Penutup/Terakhir", "Nabi Paling Kaya"], correct: 1 },
+            { question: "Mukjizat terbesar Nabi Muhammad SAW yang masih ada sampai sekarang adalah...", choices: ["Membelah Bulan", "Air keluar dari jari", "Al-Quran"], correct: 2 },
+            { question: "Kita mencintai Nabi Muhammad SAW dengan cara memperbanyak membaca...", choices: ["Sholawat", "Koran", "Komik"], correct: 0 },
+            { question: "Rukun Islam yang pertama adalah mengucapkan...", choices: ["Syahadat", "Subhanallah", "Alhamdulillah"], correct: 0 }
+        ];
+
+        // --- STATE VARIABLES ---
+        let gameState = 'start'; // start, playing, result
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timeLeft = 5; // UPDATE: WAKTU 5 DETIK
+        let isSpeaking = false;
+        let timerInterval = null;
+        let isFeedbackShowing = false;
+        
+        const app = document.getElementById('app');
+
+        // --- TTS FUNCTION ---
+        function speakText(text, onEndCallback) {
+            window.speechSynthesis.cancel();
+            
+            // Penggantian Kata (Adab)
+            const textToSpeak = text
+                .replace(/SWT/g, "Subhanahu wa ta'ala")
+                .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam")
+                .replace(/RA/g, "Radhiallahu 'anhu") // Tambahan untuk sahabat
+                .replace(/RA/g, "Radhiallahu 'anha"); // Tambahan untuk shahabiyah (basic replacement)
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'id-ID'; 
+            utterance.rate = 0.9; 
+            utterance.pitch = 1.1; 
+            
+            utterance.onstart = () => {
+                isSpeaking = true;
+                updateStatusText();
+            };
+            
+            utterance.onend = () => {
+                isSpeaking = false;
+                updateStatusText();
+                if (onEndCallback) onEndCallback();
+            };
+
+            // Error handling for TTS
+            utterance.onerror = (e) => {
+                console.error("TTS Error:", e);
+                isSpeaking = false;
+                if (onEndCallback) onEndCallback();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- LOGIC FUNCTIONS ---
+
+        function startQuiz() {
+            gameState = 'playing';
+            score = 0;
+            currentQuestionIndex = 0;
+            renderQuiz();
+            playQuestion();
+        }
+
+        function playQuestion() {
+            if(gameState !== 'playing') return;
+            
+            timeLeft = 5; // UPDATE: RESET KE 5 DETIK
+            updateTimerUI();
+            
+            const q = allQuestions[currentQuestionIndex];
+            const text = `${q.question}. A. ${q.choices[0]}. B. ${q.choices[1]}. C. ${q.choices[2]}.`;
+            
+            // Stop timer while reading
+            clearInterval(timerInterval);
+            
+            speakText(text, () => {
+                // Start timer ONLY after speaking finishes
+                if(gameState === 'playing' && !isFeedbackShowing) {
+                    startTimer();
+                }
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); // Timeout Logic
+                }
+            }, 1000);
+        }
+
+        function handleAnswer(choiceIndex) {
+            if(isFeedbackShowing) return;
+            
+            // Stop TTS & Timer
+            window.speechSynthesis.cancel();
+            clearInterval(timerInterval);
+            isSpeaking = false;
+            isFeedbackShowing = true;
+
+            const isCorrect = choiceIndex === allQuestions[currentQuestionIndex].correct;
+            const isTimeout = choiceIndex === -1;
+
+            // Update Score
+            if(isCorrect) score += 10;
+
+            // Render Feedback Overlay
+            renderFeedback(isCorrect, isTimeout);
+
+            // Audio Feedback
+            const appreciationMessages = [
+                "Masya Allah, Hebat sekali!",
+                "Luar biasa! Jawabanmu benar.",
+                "Pintar! Kamu anak cerdas.",
+                "Alhamdulillah, tepat sekali!",
+                "Keren! Pertahankan semangatmu.",
+                "Wow, kamu benar-benar paham!",
+                "Benar! Kamu makin pintar.",
+                "Seratus buat kamu! Lanjutkan."
+            ];
+
+            let msg = "";
+            if (isCorrect) {
+                msg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+            } else if (isTimeout) {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                msg = `Jawabannya adalah ${correctAns}.`;
+            } else {
+                msg = "Jawaban kurang tepat. Jangan menyerah!";
+            }
+            speakText(msg);
+
+            // Delay next question
+            setTimeout(() => {
+                isFeedbackShowing = false;
+                removeFeedback();
+                
+                if (currentQuestionIndex < allQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuiz();
+                    playQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 4000); 
+        }
+
+        function finishQuiz() {
+            gameState = 'result';
+            renderResult();
+            speakText("Alhamdulillah kuis selesai. Mari lihat nilaimu!");
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function updateStatusText() {
+            const el = document.getElementById('status-text');
+            if(el) {
+                el.innerText = isSpeaking ? "" : "Waktu berjalan!";
+            }
+        }
+
+        function updateTimerUI() {
+            const timerEl = document.getElementById('timer-val');
+            const containerEl = document.getElementById('timer-container');
+            const iconEl = document.getElementById('timer-icon');
+
+            if(!timerEl || !containerEl) return;
+
+            timerEl.innerText = timeLeft;
+            
+            // Styling logic
+            containerEl.className = `flex flex-row md:flex-col items-center justify-center p-4 md:p-8 rounded-3xl shadow-lg border-4 transition-all duration-300 md:w-56 shrink-0 order-1 `;
+            
+            // UPDATE: Logika Warna untuk 5 Detik
+            // 0-1 detik: Merah (Kritis)
+            // 2-3 detik: Oranye (Hati-hati)
+            // 4-5 detik: Hijau (Aman)
+            if (timeLeft <= 1) {
+                containerEl.classList.add('bg-red-50', 'border-red-500', 'ring-4', 'ring-red-200', 'animate-pulse');
+                timerEl.classList.remove('text-blue-600', 'text-orange-600', 'text-emerald-700');
+                timerEl.classList.add('text-red-600');
+                if(iconEl) iconEl.setAttribute('stroke', 'red');
+            } else if (timeLeft <= 3) {
+                containerEl.classList.add('bg-orange-100', 'border-orange-500', 'ring-4', 'ring-orange-200');
+                timerEl.classList.remove('text-blue-600', 'text-red-600', 'text-emerald-700');
+                timerEl.classList.add('text-orange-600');
+                if(iconEl) iconEl.setAttribute('stroke', 'orange');
+            } else {
+                containerEl.classList.add('bg-emerald-100', 'border-emerald-500'); // Warna Hijau Emerald untuk Nabi
+                timerEl.classList.remove('text-blue-600', 'text-red-600', 'text-orange-600');
+                timerEl.classList.add('text-emerald-700');
+                if(iconEl) iconEl.setAttribute('stroke', 'green');
+            }
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen font-sans text-center">
+                    <div class="bg-gradient-to-b from-emerald-400 to-teal-600 fixed inset-0 z-[-1]"></div>
+                    <div class="mb-6 animate-bounce text-yellow-300">
+                        <i data-lucide="moon" width="80" height="80" fill="currentColor"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-md text-yellow-300">
+                        Kuis Nabi Muhammad SAW
+                    </h1>
+                    <p class="text-xl mb-6 bg-white/20 text-white p-4 rounded-xl backdrop-blur-sm">
+                        40 Soal Sirah Nabawiyah <br/> (Tantangan 5 Detik)
+                    </p>
+                    <button onclick="startQuiz()" class="flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-teal-900 font-bold py-4 px-12 rounded-full text-2xl shadow-lg transform transition hover:scale-105 active:scale-95">
+                        <i data-lucide="play" fill="currentColor"></i>
+                        MULAI KUIS
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderQuiz() {
+            const q = allQuestions[currentQuestionIndex];
+            
+            app.innerHTML = `
+                <!-- Header -->
+                <div class="w-full max-w-4xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-teal-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                            ${currentQuestionIndex + 1}
+                        </div>
+                        <span class="text-gray-500 font-medium">/ ${allQuestions.length}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border border-yellow-300">
+                        <i data-lucide="star" class="text-yellow-500 fill-current" width="20"></i>
+                        <span class="font-bold text-yellow-700">${score}</span>
+                    </div>
+                </div>
+
+                <!-- Question Area -->
+                <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden mb-6 relative">
+                    <button onclick="playQuestion()" class="absolute top-4 right-4 bg-teal-100 hover:bg-teal-200 text-teal-600 p-3 rounded-full transition-all">
+                        <i data-lucide="volume-2" width="32"></i>
+                    </button>
+                    <div class="p-8 pt-16 text-center">
+                        <h3 class="text-2xl md:text-3xl font-bold text-teal-900 leading-snug">
+                            ${q.question}
+                        </h3>
+                        <p id="status-text" class="mt-4 text-sm text-gray-400 italic min-h-[20px]"></p>
+                    </div>
+                </div>
+
+                <!-- Flex Container for Timer & Answers -->
+                <div class="w-full max-w-4xl flex flex-col md:flex-row gap-6 items-stretch md:items-start">
+                    
+                    <!-- Timer (Left/Top) -->
+                    <div id="timer-container" class="bg-emerald-100 border-emerald-500 flex flex-row md:flex-col items-center justify-center p-4 md:p-8 rounded-3xl shadow-lg border-4 transition-all duration-300 md:w-56 shrink-0 order-1">
+                        <i data-lucide="clock" id="timer-icon" width="48" height="48" class="md:w-20 md:h-20 text-emerald-600"></i>
+                        <div class="ml-4 md:ml-0 md:mt-4 text-center">
+                            <!-- UPDATE: Start text at 5 -->
+                            <div id="timer-val" class="text-6xl md:text-8xl font-black leading-none text-emerald-700">5</div>
+                            <div class="text-sm md:text-xl text-gray-400 font-bold uppercase tracking-wider mt-1">Detik</div>
+                        </div>
+                    </div>
+
+                    <!-- Answers Grid -->
+                    <div class="flex-1 grid gap-4 order-2">
+                        ${q.choices.map((choice, idx) => {
+                            const labels = ["A", "B", "C"];
+                            return `
+                                <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 h-full bg-white hover:bg-teal-50 border-teal-200 hover:border-teal-400 shadow-md hover:shadow-lg">
+                                    <div class="bg-teal-500 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-teal-600 transition shrink-0">
+                                        ${labels[idx]}
+                                    </div>
+                                    <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight">${choice}</span>
+                                </button>
+                            `
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            updateTimerUI(); // Set initial color
+        }
+
+        function renderFeedback(isCorrect, isTimeout) {
+            const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+            
+            const overlay = document.createElement('div');
+            overlay.id = 'feedback-overlay';
+            overlay.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm fade-in';
+            
+            let content = '';
+            if (isCorrect) {
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-green-500">
+                        <div class="mx-auto mb-4 text-green-500"><i data-lucide="check-circle" width="80" height="80"></i></div>
+                        <h2 class="text-4xl font-black text-green-600">BENAR!</h2>
+                        <p class="text-gray-500 mt-2">Masya Allah, Hebat!</p>
+                    </div>
+                `;
+            } else {
+                const title = isTimeout ? "JAWABAN YANG BENAR" : "YAH, SALAH...";
+                
+                // Menentukan ikon: Jika timeout, tidak ada ikon. Jika salah, tampilkan x-circle.
+                let iconHtml = '';
+                if (!isTimeout) {
+                    iconHtml = `<div class="mx-auto mb-4 text-red-500"><i data-lucide="x-circle" width="80" height="80"></i></div>`;
+                }
+
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-red-500">
+                        ${iconHtml}
+                        <h2 class="text-2xl font-black text-red-600 uppercase tracking-wide">${title}</h2>
+                        <p class="text-gray-500 mt-2">Jawabannya adalah:<br/>
+                        <span class="font-black text-4xl text-teal-600 block mt-2">${correctAns}</span>
+                        </p>
+                    </div>
+                `;
+            }
+
+            overlay.innerHTML = content;
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+
+        function removeFeedback() {
+            const el = document.getElementById('feedback-overlay');
+            if(el) el.remove();
+        }
+
+        function renderResult() {
+            const maxScore = allQuestions.length * 10;
+            const percentage = (score / maxScore) * 100;
+            const isHighscore = score > 370;
+
+            let message = "";
+            if (isHighscore) {
+                message = "Kami tunggu kedatangan mu kembali untuk bermain kuis dengan kami";
+                startFlowerRain();
+            } else if (percentage > 70) {
+                message = "Hebat! Kamu sudah mencintai Rasulullah!";
+            } else {
+                message = "Belajar lagi Sirah Nabawiyah ya, pasti bisa!";
+            }
+
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen text-white text-center relative overflow-hidden">
+                    <div class="bg-gradient-to-b from-teal-500 to-emerald-600 fixed inset-0 z-[-1]"></div>
+                    
+                    <div class="z-10 mb-6 text-yellow-300 drop-shadow-lg">
+                         <i data-lucide="trophy" width="100" height="100"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold mb-2 z-10">Nilai Akhir</h2>
+                    <div class="text-7xl font-black mb-4 text-yellow-100 drop-shadow-md z-10">
+                        ${score}
+                    </div>
+                    <p class="text-lg mb-8 z-10">
+                        Dari Total ${maxScore} Poin
+                    </p>
+                    
+                    <p class="text-xl mb-8 font-bold bg-white/20 p-4 rounded-xl z-10 max-w-lg leading-relaxed">
+                        ${message}
+                    </p>
+                    
+                    <button onclick="location.reload()" class="flex items-center gap-2 bg-white text-teal-600 font-bold py-3 px-8 rounded-full text-xl shadow-lg hover:bg-gray-100 transition z-10 cursor-pointer">
+                        <i data-lucide="refresh-ccw" width="24"></i>
+                        Main Lagi
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function startFlowerRain() {
+            const emojis = ['🌸', '🌺', '🌹', '🌻', '🌷', '💐'];
+            for(let i=0; i<50; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'flower-drop text-4xl';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (3 + Math.random() * 4) + 's';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+            }
+        }
+
+        // --- INIT ---
+        renderStart();
+
+    </script>
+</body>
+</html>
