@@ -105,71 +105,84 @@
         let gameState = 'start'; // start, playing, result
         let currentQuestionIndex = 0;
         let score = 0;
-        let timeLeft = 5; 
+        let timePercent = 100;
         let isSpeaking = false;
         let timerInterval = null;
         let isFeedbackShowing = false;
         
-        // GLOBAL VARIABLE FOR TTS FIX
         let currentUtterance = null;
         
         const app = document.getElementById('app');
 
-        // --- TTS FUNCTION (FIXED) ---
+        // --- TTS FUNCTION (ROBUST FIX) ---
         function speakText(text, onEndCallback) {
-            // 1. Cancel previous speech
-            window.speechSynthesis.cancel();
+            // 1. Batalkan suara sebelumnya
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
             
-            // Penggantian Kata (Adab)
-            const textToSpeak = text
-                .replace(/SWT/g, "Subhanahu wa ta'ala")
-                .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam")
-                .replace(/RA/g, "Radhiallahu 'anhu"); 
+            // 2. Beri jeda 50ms agar browser siap
+            setTimeout(() => {
+                const textToSpeak = text
+                    .replace(/SWT/g, "Subhanahu wa ta'ala")
+                    .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam")
+                    .replace(/RA/g, "Radhiallahu 'anhu"); 
 
-            const utterance = new SpeechSynthesisUtterance(textToSpeak);
-            utterance.lang = 'id-ID'; 
-            utterance.rate = 0.9; 
-            utterance.pitch = 1.1; 
-            
-            // 2. Assign to global variable to prevent Garbage Collection (Fix for "isTrusted" error)
-            currentUtterance = utterance;
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID'; 
+                utterance.rate = 0.9; 
+                utterance.pitch = 1.1; 
+                
+                // Simpan referensi agar tidak dihapus browser (Fix Garbage Collection)
+                currentUtterance = utterance;
 
-            // 3. Safety Timer: If TTS hangs/fails silently, force proceed after projected time
-            // Estimate: 100ms per char + 2s buffer
-            const estimatedDuration = (textToSpeak.length * 100) + 2000;
-            const safetyTimer = setTimeout(() => {
-                if (isSpeaking) {
-                    console.warn("TTS Safety Timeout Triggered");
+                let hasCalledBack = false;
+
+                // Fungsi penyelesai tunggal
+                const done = () => {
+                    if (hasCalledBack) return;
+                    hasCalledBack = true;
                     isSpeaking = false;
-                    window.speechSynthesis.cancel();
                     updateStatusText();
                     if (onEndCallback) onEndCallback();
+                };
+
+                // Safety Timer
+                const estimatedDuration = (textToSpeak.length * 100) + 3000;
+                const safetyTimer = setTimeout(() => {
+                    if (isSpeaking) {
+                        console.warn("TTS Timeout - Proceeding");
+                        window.speechSynthesis.cancel();
+                        done();
+                    }
+                }, estimatedDuration);
+                
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    updateStatusText();
+                };
+                
+                utterance.onend = () => {
+                    clearTimeout(safetyTimer);
+                    done();
+                };
+
+                utterance.onerror = (e) => {
+                    clearTimeout(safetyTimer);
+                    if (e.error !== 'interrupted' && e.error !== 'canceled') {
+                        console.warn("TTS Issue (Auto-resolved):", e.error || "Unknown");
+                    }
+                    done();
+                };
+
+                // Jalankan suara
+                try {
+                    window.speechSynthesis.speak(utterance);
+                } catch (err) {
+                    console.warn("TTS Speak Error:", err);
+                    done();
                 }
-            }, estimatedDuration);
-            
-            utterance.onstart = () => {
-                isSpeaking = true;
-                updateStatusText();
-            };
-            
-            utterance.onend = () => {
-                clearTimeout(safetyTimer);
-                isSpeaking = false;
-                updateStatusText();
-                if (onEndCallback) onEndCallback();
-            };
-
-            // Error handling for TTS
-            utterance.onerror = (e) => {
-                clearTimeout(safetyTimer);
-                console.error("TTS Error handled:", e);
-                // Even if error, proceed so game doesn't get stuck
-                isSpeaking = false;
-                updateStatusText();
-                if (onEndCallback) onEndCallback();
-            };
-
-            window.speechSynthesis.speak(utterance);
+            }, 50);
         }
 
         // --- LOGIC FUNCTIONS ---
@@ -185,17 +198,15 @@
         function playQuestion() {
             if(gameState !== 'playing') return;
             
-            timeLeft = 5; 
+            timePercent = 100;
             updateTimerUI();
             
             const q = allQuestions[currentQuestionIndex];
             const text = `${q.question}. A. ${q.choices[0]}. B. ${q.choices[1]}. C. ${q.choices[2]}.`;
             
-            // Stop timer while reading
             clearInterval(timerInterval);
             
             speakText(text, () => {
-                // Start timer ONLY after speaking finishes
                 if(gameState === 'playing' && !isFeedbackShowing) {
                     startTimer();
                 }
@@ -204,21 +215,21 @@
 
         function startTimer() {
             clearInterval(timerInterval);
+            
             timerInterval = setInterval(() => {
-                if(timeLeft > 0) {
-                    timeLeft--;
+                if(timePercent > 0) {
+                    timePercent -= 1; 
                     updateTimerUI();
                 } else {
                     clearInterval(timerInterval);
                     handleAnswer(-1); // Timeout Logic
                 }
-            }, 1000);
+            }, 50); // 50ms Interval -> Total 5000ms (5s)
         }
 
         function handleAnswer(choiceIndex) {
             if(isFeedbackShowing) return;
             
-            // Stop TTS & Timer
             window.speechSynthesis.cancel();
             clearInterval(timerInterval);
             isSpeaking = false;
@@ -227,13 +238,8 @@
             const isCorrect = choiceIndex === allQuestions[currentQuestionIndex].correct;
             const isTimeout = choiceIndex === -1;
 
-            // Update Score
             if(isCorrect) score += 10;
 
-            // Render Feedback Overlay
-            renderFeedback(isCorrect, isTimeout);
-
-            // Audio Feedback
             const appreciationMessages = [
                 "Masya Allah, Hebat sekali!",
                 "Luar biasa! Jawabanmu benar.",
@@ -245,18 +251,30 @@
                 "Seratus buat kamu! Lanjutkan."
             ];
 
-            let msg = "";
+            let feedbackTitle = "";
+            let feedbackText = "";
+            let speechText = "";
+
             if (isCorrect) {
-                msg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+                const randomMsg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+                feedbackTitle = "BENAR!";
+                feedbackText = randomMsg;
+                speechText = randomMsg;
             } else if (isTimeout) {
                 const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
-                msg = `Jawabannya adalah ${correctAns}.`;
+                feedbackTitle = "JAWABAN YANG BENAR";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-teal-600 block mt-2">${correctAns}</span>`;
+                speechText = `Jawabannya adalah ${correctAns}.`;
             } else {
-                msg = "Jawaban kurang tepat. Jangan menyerah!";
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "YAH, SALAH...";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-teal-600 block mt-2">${correctAns}</span>`;
+                speechText = "Jawaban kurang tepat. Jangan menyerah!";
             }
-            speakText(msg);
 
-            // Delay next question
+            renderFeedback(isCorrect, isTimeout, feedbackTitle, feedbackText);
+            speakText(speechText);
+
             setTimeout(() => {
                 isFeedbackShowing = false;
                 removeFeedback();
@@ -282,38 +300,25 @@
         function updateStatusText() {
             const el = document.getElementById('status-text');
             if(el) {
-                el.innerText = isSpeaking ? "" : "Waktu berjalan!";
+                el.innerText = isSpeaking ? "" : "Siap-siap...";
             }
         }
 
         function updateTimerUI() {
-            const timerEl = document.getElementById('timer-val');
-            const containerEl = document.getElementById('timer-container');
-            const iconEl = document.getElementById('timer-icon');
-
-            if(!timerEl || !containerEl) return;
-
-            timerEl.innerText = timeLeft;
+            const barEl = document.getElementById('timer-bar');
             
-            // Styling logic
-            containerEl.className = `flex flex-row md:flex-col items-center justify-center p-4 md:p-8 rounded-3xl shadow-lg border-4 transition-all duration-300 md:w-56 shrink-0 order-1 `;
+            if(!barEl) return;
+
+            // UPDATE: Bar Horizontal, ubah Width
+            barEl.style.width = `${timePercent}%`;
             
-            // Logika Warna untuk 5 Detik
-            if (timeLeft <= 1) {
-                containerEl.classList.add('bg-red-50', 'border-red-500', 'ring-4', 'ring-red-200', 'animate-pulse');
-                timerEl.classList.remove('text-blue-600', 'text-orange-600', 'text-emerald-700');
-                timerEl.classList.add('text-red-600');
-                if(iconEl) iconEl.setAttribute('stroke', 'red');
-            } else if (timeLeft <= 3) {
-                containerEl.classList.add('bg-orange-100', 'border-orange-500', 'ring-4', 'ring-orange-200');
-                timerEl.classList.remove('text-blue-600', 'text-red-600', 'text-emerald-700');
-                timerEl.classList.add('text-orange-600');
-                if(iconEl) iconEl.setAttribute('stroke', 'orange');
+            // Warna
+            if (timePercent > 50) {
+                barEl.className = "h-full bg-green-500 transition-all duration-75 ease-linear rounded-full";
+            } else if (timePercent > 20) {
+                barEl.className = "h-full bg-yellow-400 transition-all duration-75 ease-linear rounded-full";
             } else {
-                containerEl.classList.add('bg-emerald-100', 'border-emerald-500'); // Warna Hijau Emerald untuk Nabi
-                timerEl.classList.remove('text-blue-600', 'text-red-600', 'text-orange-600');
-                timerEl.classList.add('text-emerald-700');
-                if(iconEl) iconEl.setAttribute('stroke', 'green');
+                barEl.className = "h-full bg-red-600 transition-all duration-75 ease-linear rounded-full animate-pulse";
             }
         }
 
@@ -344,7 +349,7 @@
             
             app.innerHTML = `
                 <!-- Header -->
-                <div class="w-full max-w-4xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-6">
+                <div class="w-full max-w-4xl flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-4">
                     <div class="flex items-center gap-2">
                         <div class="bg-teal-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
                             ${currentQuestionIndex + 1}
@@ -358,7 +363,7 @@
                 </div>
 
                 <!-- Question Area -->
-                <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden mb-6 relative">
+                <div class="w-full max-w-4xl bg-white rounded-3xl shadow-xl overflow-hidden mb-4 relative">
                     <button onclick="playQuestion()" class="absolute top-4 right-4 bg-teal-100 hover:bg-teal-200 text-teal-600 p-3 rounded-full transition-all">
                         <i data-lucide="volume-2" width="32"></i>
                     </button>
@@ -370,42 +375,35 @@
                     </div>
                 </div>
 
-                <!-- Flex Container for Timer & Answers -->
-                <div class="w-full max-w-4xl flex flex-col md:flex-row gap-6 items-stretch md:items-start">
-                    
-                    <!-- Timer (Left/Top) -->
-                    <div id="timer-container" class="bg-emerald-100 border-emerald-500 flex flex-row md:flex-col items-center justify-center p-4 md:p-8 rounded-3xl shadow-lg border-4 transition-all duration-300 md:w-56 shrink-0 order-1">
-                        <i data-lucide="clock" id="timer-icon" width="48" height="48" class="md:w-20 md:h-20 text-emerald-600"></i>
-                        <div class="ml-4 md:ml-0 md:mt-4 text-center">
-                            <!-- Start text at 5 -->
-                            <div id="timer-val" class="text-6xl md:text-8xl font-black leading-none text-emerald-700">5</div>
-                            <div class="text-sm md:text-xl text-gray-400 font-bold uppercase tracking-wider mt-1">Detik</div>
-                        </div>
-                    </div>
+                <!-- TIMER BAR (DI TENGAH) - UPDATED SIZE (h-12) -->
+                <div class="w-full max-w-4xl mb-4 bg-gray-200 rounded-full h-12 border-4 border-white shadow-md overflow-hidden relative">
+                    <!-- Text Indicator - UPDATED TEXT SIZE (text-xl) -->
+                    <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-500 z-10 tracking-widest uppercase">Waktu</div>
+                    <!-- The Bar -->
+                    <div id="timer-bar" class="h-full bg-green-500 transition-all duration-75 ease-linear rounded-full" style="width: 100%;"></div>
+                </div>
 
-                    <!-- Answers Grid -->
-                    <div class="flex-1 grid gap-4 order-2">
-                        ${q.choices.map((choice, idx) => {
-                            const labels = ["A", "B", "C"];
-                            return `
-                                <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 h-full bg-white hover:bg-teal-50 border-teal-200 hover:border-teal-400 shadow-md hover:shadow-lg">
-                                    <div class="bg-teal-500 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-teal-600 transition shrink-0">
-                                        ${labels[idx]}
-                                    </div>
-                                    <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight">${choice}</span>
-                                </button>
-                            `
-                        }).join('')}
-                    </div>
+                <!-- Answers Grid (FULL WIDTH) -->
+                <div class="w-full max-w-4xl grid gap-4">
+                    ${q.choices.map((choice, idx) => {
+                        const labels = ["A", "B", "C"];
+                        return `
+                            <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 bg-white hover:bg-teal-50 border-teal-200 hover:border-teal-400 shadow-md hover:shadow-lg">
+                                <div class="bg-teal-500 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-teal-600 transition shrink-0">
+                                    ${labels[idx]}
+                                </div>
+                                <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight w-full">${choice}</span>
+                            </button>
+                        `
+                    }).join('')}
                 </div>
             `;
             lucide.createIcons();
-            updateTimerUI(); // Set initial color
+            // Initial call
+            updateTimerUI(); 
         }
 
-        function renderFeedback(isCorrect, isTimeout) {
-            const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
-            
+        function renderFeedback(isCorrect, isTimeout, title, textContent) {
             const overlay = document.createElement('div');
             overlay.id = 'feedback-overlay';
             overlay.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm fade-in';
@@ -415,13 +413,11 @@
                 content = `
                     <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-green-500">
                         <div class="mx-auto mb-4 text-green-500"><i data-lucide="check-circle" width="80" height="80"></i></div>
-                        <h2 class="text-4xl font-black text-green-600">BENAR!</h2>
-                        <p class="text-gray-500 mt-2">Masya Allah, Hebat!</p>
+                        <h2 class="text-4xl font-black text-green-600">${title}</h2>
+                        <p class="text-gray-500 mt-2 text-xl font-bold">${textContent}</p>
                     </div>
                 `;
             } else {
-                const title = isTimeout ? "JAWABAN YANG BENAR" : "YAH, SALAH...";
-                
                 let iconHtml = '';
                 if (!isTimeout) {
                     iconHtml = `<div class="mx-auto mb-4 text-red-500"><i data-lucide="x-circle" width="80" height="80"></i></div>`;
@@ -431,8 +427,8 @@
                     <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-red-500">
                         ${iconHtml}
                         <h2 class="text-2xl font-black text-red-600 uppercase tracking-wide">${title}</h2>
-                        <p class="text-gray-500 mt-2">Jawabannya adalah:<br/>
-                        <span class="font-black text-4xl text-teal-600 block mt-2">${correctAns}</span>
+                        <p class="text-gray-500 mt-2">
+                        ${textContent}
                         </p>
                     </div>
                 `;
