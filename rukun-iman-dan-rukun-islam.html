@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Literasi Rukun Iman & Islam</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        
+        /* Animasi Hujan Bunga */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        .flower-drop {
+            position: absolute;
+            top: -50px;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* Animasi Fade In */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Animasi Karakter (Masjid) */
+        @keyframes bounce-gentle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .mosque-bounce { animation: bounce-gentle 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-purple-100 min-h-screen flex flex-col items-center text-gray-800 overflow-x-hidden">
+
+    <!-- Container Utama -->
+    <div id="app" class="w-full max-w-6xl p-4 flex-1 flex flex-col items-center">
+        <!-- Konten akan dirender di sini oleh JavaScript -->
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA SOAL (30 Soal Literasi: Rukun Iman & Islam) ---
+        const allQuestions = [
+            // RUKUN ISLAM (Praktik Sehari-hari)
+            { question: "Pak Budi ingin masuk agama Islam. Kalimat pertama yang harus diucapkan Pak Budi sebagai syarat menjadi muslim adalah...", choices: ["Alhamdulillah", "Dua Kalimat Syahadat", "Allahu Akbar"], correct: 1 },
+            { question: "Terdengar suara Azan 'Hayya 'alash shalah...'. Andi segera mengambil air wudhu dan pergi ke masjid. Andi sedang mengerjakan Rukun Islam yang ke...", choices: ["Ke-1 (Syahadat)", "Ke-2 (Shalat)", "Ke-3 (Zakat)"], correct: 1 },
+            { question: "Setiap bulan Ramadhan, Rina menahan lapar dan haus dari pagi sampai sore. Rina sedang melaksanakan...", choices: ["Puasa", "Zakat", "Haji"], correct: 0 },
+            { question: "Ayah memiliki rezeki yang banyak. Setiap tahun, Ayah memberikan sebagian hartanya berupa beras kepada fakir miskin. Ibadah Ayah disebut...", choices: ["Haji", "Shalat", "Zakat"], correct: 2 },
+            { question: "Kakek sudah menabung uang bertahun-tahun. Tahun ini Kakek pergi ke kota Makkah untuk mengelilingi Ka'bah. Kakek sedang melaksanakan...", choices: ["Ibadah Haji", "Puasa", "Shalat Jumat"], correct: 0 },
+            { question: "Rukun Islam itu ada 5 perkara. Urutan yang benar setelah Syahadat adalah...", choices: ["Puasa", "Zakat", "Shalat"], correct: 2 },
+            { question: "Dalam syahadat, kita bersaksi bahwa Nabi Muhammad SAW adalah...", choices: ["Tuhan kita", "Utusan Allah", "Malaikat"], correct: 1 },
+            { question: "Zakat Fitrah biasanya dikeluarkan umat Islam pada saat...", choices: ["Akhir bulan Ramadhan", "Hari Raya Kurban", "Setiap hari Senin"], correct: 0 },
+            { question: "Ibadah Haji wajib dilakukan bagi orang yang...", choices: ["Sakit", "Mampu (biaya dan fisik)", "Anak-anak"], correct: 1 },
+            { question: "Shalat yang wajib dikerjakan sehari semalam ada berapa waktu?", choices: ["3 Waktu", "5 Waktu", "10 Waktu"], correct: 1 },
+
+            // RUKUN IMAN (Perilaku & Keyakinan)
+            { question: "Siti melihat gunung yang tinggi dan lautan yang luas. Siti yakin semua itu ada penciptanya. Siti beriman kepada...", choices: ["Malaikat", "Allah SWT", "Nabi"], correct: 1 },
+            { question: "Walaupun tidak ada orang yang melihat, Budi tidak berani mencuri karena yakin ada yang mencatat amalnya. Budi beriman kepada...", choices: ["Malaikat", "Kitab", "Hari Kiamat"], correct: 0 },
+            { question: "Ahmad rajin membaca Al-Qur'an setiap sore. Ahmad percaya Al-Qur'an adalah pedoman hidup. Ini tanda Ahmad beriman kepada...", choices: ["Rasul", "Kitab-kitab Allah", "Takdir"], correct: 1 },
+            { question: "Kita wajib percaya bahwa Nabi Muhammad SAW adalah manusia mulia yang menyampaikan wahyu. Ini adalah Rukun Iman ke...", choices: ["Ke-1", "Ke-4 (Rasul)", "Ke-6"], correct: 1 },
+            { question: "Suatu hari nanti alam semesta akan hancur dan manusia akan dibangkitkan. Keyakinan ini disebut iman kepada...", choices: ["Hari Kiamat (Hari Akhir)", "Malaikat", "Kitab"], correct: 0 },
+            { question: "Rani sakit demam, lalu ia berobat dan sembuh. Rani sadar sakit dan sehat sudah diatur Allah. Rani beriman kepada...", choices: ["Qada dan Qadar (Takdir)", "Malaikat", "Hari Akhir"], correct: 0 },
+            { question: "Malaikat yang bertugas menyampaikan wahyu kepada para Nabi adalah...", choices: ["Jibril", "Mikail", "Israfil"], correct: 0 },
+            { question: "Kitab suci yang diturunkan kepada Nabi Daud AS adalah...", choices: ["Al-Qur'an", "Zabur", "Injil"], correct: 1 },
+            { question: "Nabi dan Rasul jumlahnya banyak, tapi yang wajib kita ketahui jumlahnya ada...", choices: ["10", "25", "99"], correct: 1 },
+            { question: "Sikap beriman kepada Allah dalam kehidupan sehari-hari contohnya...", choices: ["Malas belajar", "Rajin beribadah dan berdoa", "Suka berbohong"], correct: 1 },
+
+            // HUBUNGAN IMAN & ISLAM (Praktik)
+            { question: "Jika kita beriman kepada Malaikat Raqib dan Atid, maka saat berbicara kita harus...", choices: ["Berteriak-teriak", "Berkata jujur dan sopan", "Mengejek teman"], correct: 1 },
+            { question: "Rukun Iman berjumlah 6, sedangkan Rukun Islam berjumlah...", choices: ["Empat", "Lima", "Enam"], correct: 1 },
+            { question: "Al-Qur'an mengajarkan kita untuk sayang kepada orang tua. Jika Ibu minta tolong, sikap kita...", choices: ["Pura-pura tidur", "Segera membantu", "Marah-marah"], correct: 1 },
+            { question: "Haji dilaksanakan di kota Makkah. Di sana terdapat bangunan kubus hitam yang menjadi kiblat shalat, yaitu...", choices: ["Masjid Nabawi", "Ka'bah", "Menara"], correct: 1 },
+            { question: "Iman artinya...", choices: ["Percaya / Yakin", "Melihat", "Mendengar"], correct: 0 },
+            { question: "Islam mengajarkan kebersihan. Salah satu cara menjaga kebersihan sebelum shalat adalah...", choices: ["Makan", "Tidur", "Wudhu"], correct: 2 },
+            { question: "Nabi Muhammad SAW diberi gelar Al-Amin karena...", choices: ["Suka berkelahi", "Sangat Jujur / Dapat dipercaya", "Kaya Raya"], correct: 1 },
+            { question: "Takdir Allah ada yang baik dan ada yang buruk. Jika mendapat musibah, sikap kita sebaiknya...", choices: ["Marah", "Sabar", "Putus asa"], correct: 1 },
+            { question: "Syahadat terdiri dari dua kalimat, yaitu persaksian kepada Allah dan persaksian kepada...", choices: ["Malaikat", "Nabi Muhammad SAW", "Kitab"], correct: 1 },
+            { question: "Anak yang sholeh selalu mendoakan kedua orang tuanya. Doa adalah bukti kita memohon hanya kepada...", choices: ["Allah SWT", "Malaikat", "Jin"], correct: 0 }
+        ];
+
+        // --- STATE VARIABLES ---
+        let gameState = 'start'; 
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timePercent = 100;
+        let isSpeaking = false;
+        let timerInterval = null;
+        let isFeedbackShowing = false;
+        
+        let currentUtterance = null;
+        
+        const app = document.getElementById('app');
+
+        // --- SVG CHARACTER (MASJID LUCU) ---
+        function getCuteMosqueSVG() {
+            return `
+            <svg viewBox="0 0 300 300" class="w-full h-auto mosque-bounce drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(50, 50)">
+                    <!-- Bangunan Utama -->
+                    <rect x="40" y="100" width="120" height="100" fill="#F3E8FF" stroke="#7C3AED" stroke-width="3" rx="5"/>
+                    
+                    <!-- Pintu -->
+                    <path d="M80 200 L80 150 Q100 130 120 150 L120 200 Z" fill="#FBBF24" stroke="#D97706" stroke-width="2"/>
+                    <circle cx="110" cy="170" r="2" fill="#D97706"/> <!-- Gagang Pintu -->
+
+                    <!-- Kubah Besar -->
+                    <path d="M30 100 Q100 20 170 100 Z" fill="#FCD34D" stroke="#D97706" stroke-width="3"/>
+                    
+                    <!-- Simbol di atas kubah DIHAPUS -->
+
+                    <!-- Menara Kiri -->
+                    <rect x="10" y="80" width="30" height="120" fill="#E9D5FF" stroke="#7C3AED" stroke-width="2"/>
+                    <path d="M5 80 L25 50 L45 80 Z" fill="#FCD34D" stroke="#D97706" stroke-width="2"/>
+                    <rect x="20" y="100" width="10" height="20" fill="#C084FC" rx="5"/>
+
+                    <!-- Menara Kanan -->
+                    <rect x="160" y="80" width="30" height="120" fill="#E9D5FF" stroke="#7C3AED" stroke-width="2"/>
+                    <path d="M155 80 L175 50 L195 80 Z" fill="#FCD34D" stroke="#D97706" stroke-width="2"/>
+                    <rect x="170" y="100" width="10" height="20" fill="#C084FC" rx="5"/>
+
+                    <!-- Wajah Kawaii di Kubah -->
+                    <circle cx="80" cy="80" r="4" fill="#374151"/> <!-- Mata Kiri -->
+                    <circle cx="120" cy="80" r="4" fill="#374151"/> <!-- Mata Kanan -->
+                    <path d="M95 85 Q100 90 105 85" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/> <!-- Senyum -->
+                    <circle cx="75" cy="88" r="3" fill="#F472B6" opacity="0.6"/> <!-- Pipi -->
+                    <circle cx="125" cy="88" r="3" fill="#F472B6" opacity="0.6"/> <!-- Pipi -->
+                </g>
+            </svg>
+            `;
+        }
+
+        // --- TTS FUNCTION (ROBUST) ---
+        function speakText(text, onEndCallback) {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            setTimeout(() => {
+                const textToSpeak = text
+                    .replace(/SWT/g, "Subhanahu wa ta'ala")
+                    .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam")
+                    .replace(/RA/g, "Radhiallahu 'anhu")
+                    .replace(/AS/g, "Alaihissalam");
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID'; 
+                utterance.rate = 0.9; 
+                utterance.pitch = 1.1; 
+                
+                currentUtterance = utterance;
+
+                let hasCalledBack = false;
+                const done = () => {
+                    if (hasCalledBack) return;
+                    hasCalledBack = true;
+                    isSpeaking = false;
+                    updateStatusText();
+                    if (onEndCallback) onEndCallback();
+                };
+
+                const estimatedDuration = (textToSpeak.length * 100) + 3000;
+                const safetyTimer = setTimeout(() => {
+                    if (isSpeaking) {
+                        console.warn("TTS Timeout");
+                        window.speechSynthesis.cancel();
+                        done();
+                    }
+                }, estimatedDuration);
+                
+                utterance.onstart = () => { isSpeaking = true; updateStatusText(); };
+                utterance.onend = () => { clearTimeout(safetyTimer); done(); };
+                utterance.onerror = (e) => { clearTimeout(safetyTimer); done(); };
+
+                try {
+                    window.speechSynthesis.speak(utterance);
+                } catch (err) {
+                    done();
+                }
+            }, 50);
+        }
+
+        // --- LOGIC FUNCTIONS ---
+
+        function startQuiz() {
+            gameState = 'playing';
+            score = 0;
+            currentQuestionIndex = 0;
+            renderQuiz();
+            playQuestion();
+        }
+
+        function playQuestion() {
+            if(gameState !== 'playing') return;
+            timePercent = 100;
+            updateTimerUI();
+            
+            const q = allQuestions[currentQuestionIndex];
+            const text = `${q.question}. A. ${q.choices[0]}. B. ${q.choices[1]}. C. ${q.choices[2]}.`;
+            
+            clearInterval(timerInterval);
+            speakText(text, () => {
+                if(gameState === 'playing' && !isFeedbackShowing) startTimer();
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(timePercent > 0) {
+                    timePercent -= 1; 
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); 
+                }
+            }, 50); 
+        }
+
+        function handleAnswer(choiceIndex) {
+            if(isFeedbackShowing) return;
+            window.speechSynthesis.cancel();
+            clearInterval(timerInterval);
+            isSpeaking = false;
+            isFeedbackShowing = true;
+
+            const isCorrect = choiceIndex === allQuestions[currentQuestionIndex].correct;
+            const isTimeout = choiceIndex === -1;
+
+            if(isCorrect) score += 10;
+
+            const appreciationMessages = [
+                "Masya Allah, Hebat sekali!", "Luar biasa! Benar.", "Pintar! Kamu anak cerdas.",
+                "Alhamdulillah, tepat sekali!", "Keren! Pertahankan.", "Wow, kamu benar-benar paham!",
+                "Benar! Kamu makin pintar.", "Seratus buat kamu!"
+            ];
+
+            let feedbackTitle = "", feedbackText = "", speechText = "";
+
+            if (isCorrect) {
+                const randomMsg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+                feedbackTitle = "BENAR!";
+                feedbackText = randomMsg;
+                speechText = randomMsg;
+            } else if (isTimeout) {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "JAWABAN YANG BENAR";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-purple-600 block mt-2">${correctAns}</span>`;
+                speechText = `Jawabannya adalah ${correctAns}.`;
+            } else {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "YAH, SALAH...";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-purple-600 block mt-2">${correctAns}</span>`;
+                speechText = "Jawaban kurang tepat. Jangan menyerah!";
+            }
+
+            renderFeedback(isCorrect, isTimeout, feedbackTitle, feedbackText);
+            speakText(speechText);
+
+            setTimeout(() => {
+                isFeedbackShowing = false;
+                removeFeedback();
+                if (currentQuestionIndex < allQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuiz();
+                    playQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 4000); 
+        }
+
+        function finishQuiz() {
+            gameState = 'result';
+            renderResult();
+            speakText("Alhamdulillah kuis selesai. Mari lihat nilaimu!");
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function updateStatusText() {
+            const el = document.getElementById('status-text');
+            if(el) el.innerText = isSpeaking ? "" : "Siap-siap...";
+        }
+
+        function updateTimerUI() {
+            const barEl = document.getElementById('timer-bar');
+            if(!barEl) return;
+            barEl.style.width = `${timePercent}%`;
+            
+            if (timePercent > 50) {
+                barEl.className = "h-full bg-green-500 transition-all duration-75 ease-linear rounded-full";
+            } else if (timePercent > 20) {
+                barEl.className = "h-full bg-yellow-400 transition-all duration-75 ease-linear rounded-full";
+            } else {
+                barEl.className = "h-full bg-red-600 transition-all duration-75 ease-linear rounded-full animate-pulse";
+            }
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen font-sans text-center w-full">
+                    <div class="bg-gradient-to-b from-purple-400 to-indigo-600 fixed inset-0 z-[-1]"></div>
+                    <div class="mb-6 animate-bounce text-yellow-300">
+                        <i data-lucide="book-open" width="80" height="80" fill="currentColor"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-md text-yellow-300">
+                        Kuis Rukun Iman & Islam
+                    </h1>
+                    <p class="text-xl mb-6 bg-white/20 text-white p-4 rounded-xl backdrop-blur-sm">
+                        30 Soal Literasi Seru <br/> (Iman, Islam & Akhlak)
+                    </p>
+                    <button onclick="startQuiz()" class="flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-purple-900 font-bold py-4 px-12 rounded-full text-2xl shadow-lg transform transition hover:scale-105 active:scale-95">
+                        <i data-lucide="play" fill="currentColor"></i>
+                        MULAI KUIS
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderQuiz() {
+            const q = allQuestions[currentQuestionIndex];
+            
+            app.innerHTML = `
+                <div class="w-full flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-4 border-b-4 border-purple-200">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-purple-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                            ${currentQuestionIndex + 1}
+                        </div>
+                        <span class="text-gray-500 font-medium">/ ${allQuestions.length}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border border-yellow-300">
+                        <i data-lucide="star" class="text-yellow-500 fill-current" width="20"></i>
+                        <span class="font-bold text-yellow-700">${score}</span>
+                    </div>
+                </div>
+
+                <div class="w-full flex flex-col lg:flex-row gap-6 items-stretch">
+                    
+                    <div class="flex-1 flex flex-col w-full">
+                        <!-- UPDATE: Background Kuning, Text Hitam -->
+                        <div class="w-full bg-yellow-100 rounded-3xl shadow-xl overflow-hidden mb-4 relative border-4 border-yellow-300">
+                            <div class="p-8 text-center">
+                                <h3 class="text-2xl md:text-3xl font-bold text-black leading-snug">
+                                    ${q.question}
+                                </h3>
+                                <p id="status-text" class="mt-4 text-sm text-gray-600 italic min-h-[20px]"></p>
+                            </div>
+                        </div>
+
+                        <div class="w-full mb-4 bg-gray-200 rounded-full h-12 border-4 border-white shadow-md overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-500 z-10 tracking-widest uppercase">Waktu</div>
+                            <div id="timer-bar" class="h-full bg-green-500 transition-all duration-75 ease-linear rounded-full" style="width: 100%;"></div>
+                        </div>
+
+                        <div class="w-full grid gap-4">
+                            ${q.choices.map((choice, idx) => {
+                                const labels = ["A", "B", "C"];
+                                return `
+                                    <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 bg-white hover:bg-purple-50 border-purple-200 hover:border-purple-400 shadow-md hover:shadow-lg">
+                                        <div class="bg-purple-600 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-purple-700 transition shrink-0">
+                                            ${labels[idx]}
+                                        </div>
+                                        <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight w-full">${choice}</span>
+                                    </button>
+                                `
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="hidden lg:flex flex-col items-center justify-end w-64 shrink-0 relative">
+                        <div class="mb-4 bg-white p-4 rounded-xl rounded-bl-none shadow-lg border-2 border-purple-200 animate-bounce">
+                            <p class="text-purple-700 font-bold text-center">Ayo, Semangat!</p>
+                        </div>
+                        ${getCuteMosqueSVG()}
+                    </div>
+
+                </div>
+            `;
+            lucide.createIcons();
+            updateTimerUI(); 
+        }
+
+        function renderFeedback(isCorrect, isTimeout, title, textContent) {
+            const overlay = document.createElement('div');
+            overlay.id = 'feedback-overlay';
+            overlay.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm fade-in';
+            
+            let content = '';
+            if (isCorrect) {
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-green-500">
+                        <div class="mx-auto mb-4 text-green-500"><i data-lucide="check-circle" width="80" height="80"></i></div>
+                        <h2 class="text-4xl font-black text-green-600">${title}</h2>
+                        <p class="text-gray-500 mt-2 text-xl font-bold">${textContent}</p>
+                    </div>
+                `;
+            } else {
+                let iconHtml = '';
+                if (!isTimeout) {
+                    iconHtml = `<div class="mx-auto mb-4 text-red-500"><i data-lucide="x-circle" width="80" height="80"></i></div>`;
+                }
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-red-500">
+                        ${iconHtml}
+                        <h2 class="text-2xl font-black text-red-600 uppercase tracking-wide">${title}</h2>
+                        <p class="text-gray-500 mt-2">${textContent}</p>
+                    </div>
+                `;
+            }
+            overlay.innerHTML = content;
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+
+        function removeFeedback() {
+            const el = document.getElementById('feedback-overlay');
+            if(el) el.remove();
+        }
+
+        function renderResult() {
+            const maxScore = allQuestions.length * 10;
+            const percentage = (score / maxScore) * 100;
+            const isHighscore = score > 270; 
+
+            let message = "";
+            if (isHighscore) {
+                message = "Masya Allah! Kamu Hebat! Imanmu Kuat!";
+                startFlowerRain();
+            } else if (percentage > 70) {
+                message = "Alhamdulillah! Nilaimu Bagus Sekali!";
+            } else {
+                message = "Jangan menyerah, ayo belajar lagi ya!";
+            }
+
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen text-white text-center relative overflow-hidden">
+                    <div class="bg-gradient-to-b from-purple-500 to-indigo-600 fixed inset-0 z-[-1]"></div>
+                    <div class="z-10 mb-6 text-yellow-300 drop-shadow-lg">
+                         <i data-lucide="trophy" width="100" height="100"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold mb-2 z-10">Nilai Akhir</h2>
+                    <div class="text-7xl font-black mb-4 text-yellow-100 drop-shadow-md z-10">
+                        ${score}
+                    </div>
+                    <p class="text-lg mb-8 z-10">
+                        Dari Total ${maxScore} Poin
+                    </p>
+                    <p class="text-xl mb-8 font-bold bg-white/20 p-4 rounded-xl z-10 max-w-lg leading-relaxed">
+                        ${message}
+                    </p>
+                    <button onclick="location.reload()" class="flex items-center gap-2 bg-white text-purple-600 font-bold py-3 px-8 rounded-full text-xl shadow-lg hover:bg-gray-100 transition z-10 cursor-pointer">
+                        <i data-lucide="refresh-ccw" width="24"></i>
+                        Main Lagi
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function startFlowerRain() {
+            const emojis = ['🌸', '🌺', '🌹', '🌻', '🌷', '💐'];
+            for(let i=0; i<50; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'flower-drop text-4xl';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (3 + Math.random() * 4) + 's';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+            }
+        }
+
+        // --- INIT ---
+        renderStart();
+
+    </script>
+</body>
+</html>
