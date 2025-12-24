@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Akhlak Terpuji & Tercela</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        
+        /* Animasi Hujan Bunga */
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        .flower-drop {
+            position: absolute;
+            top: -50px;
+            animation-name: fall;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        /* Animasi Fade In */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Animasi Karakter */
+        @keyframes breathe {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        
+        .char-breathe { animation: breathe 3s ease-in-out infinite; }
+        .eye-blink { transform-origin: center; animation: blink 4s infinite; }
+    </style>
+</head>
+<body class="bg-orange-100 min-h-screen flex flex-col items-center text-gray-800 overflow-x-hidden">
+
+    <!-- Container Utama -->
+    <div id="app" class="w-full max-w-6xl p-4 flex-1 flex flex-col items-center">
+        <!-- Konten akan dirender di sini oleh JavaScript -->
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA SOAL (30 Soal Literasi: Akhlak) ---
+        const allQuestions = [
+            // AKHLAK TERPUJI: JUJUR (1-5)
+            { question: "Andi memecahkan vas bunga Ibu saat bermain bola di dalam rumah. Tidak ada yang melihatnya. Apa yang harus Andi lakukan?", choices: ["Menyembunyikan pecahan", "Mengaku dan meminta maaf", "Menuduh kucing"], correct: 1 },
+            { question: "Bu Guru memberikan uang kembalian lebih kepada Siti. Siti tahu itu kelebihan. Sikap Siti yang jujur adalah...", choices: ["Mengembalikannya", "Jajan diam-diam", "Menyimpannya"], correct: 0 },
+            { question: "Saat ujian, Dedi tidak tahu jawaban nomor 5. Temannya menawarkan contekan. Dedi menolak karena mencontek itu perbuatan...", choices: ["Jujur", "Curang / Tidak Jujur", "Hebat"], correct: 1 },
+            { question: "Orang yang jujur akan...", choices: ["Dibenci teman", "Dijauhi orang", "Dipercaya dan disayang Allah"], correct: 2 },
+            { question: "Lawan kata dari jujur adalah...", choices: ["Dusta / Bohong", "Amanah", "Sabar"], correct: 0 },
+
+            // AKHLAK TERPUJI: AMANAH (6-10)
+            { question: "Amanah artinya...", choices: ["Dapat dipercaya", "Suka berbohong", "Suka marah"], correct: 0 },
+            { question: "Ayah menitipkan surat untuk diberikan kepada Paman. Budi segera mengantarkannya tanpa membukanya. Budi anak yang...", choices: ["Khianat", "Amanah", "Pemalas"], correct: 1 },
+            { question: "Rani dipinjami buku cerita oleh Sasa. Rani menjaga buku itu agar tidak rusak dan sobek. Itu tandanya Rani...", choices: ["Menjaga amanah", "Ingin memilikinya", "Tidak peduli"], correct: 0 },
+            { question: "Ketua kelas dipilih untuk menjaga ketertiban kelas. Jika ketua kelas malah ribut, berarti dia...", choices: ["Bertanggung jawab", "Melanggar amanah", "Anak pintar"], correct: 1 },
+            { question: "Nabi Muhammad SAW diberi gelar Al-Amin karena beliau sangat...", choices: ["Kaya Raya", "Amanah / Terpercaya", "Kuat"], correct: 1 },
+
+            // AKHLAK TERPUJI: SOPAN SANTUN (11-15)
+            { question: "Jika berjalan melewati orang tua yang sedang duduk, sebaiknya kita mengucapkan...", choices: ["Minggir!", "Permisi", "Awas!"], correct: 1 },
+            { question: "Ketika guru sedang menjelaskan pelajaran di depan kelas, sikap murid yang sopan adalah...", choices: ["Mengobrol sendiri", "Tidur di meja", "Mendengarkan dengan baik"], correct: 2 },
+            { question: "Berbicara kepada orang tua harus dengan nada suara yang...", choices: ["Keras dan membentak", "Lembut dan sopan", "Kasar"], correct: 1 },
+            { question: "Sebelum masuk ke rumah orang lain, kita harus...", choices: ["Mengucap salam dan mengetuk pintu", "Langsung masuk saja", "Mengintip jendela"], correct: 0 },
+            { question: "Jika kita diberi hadiah oleh nenek, kita harus mengucapkan...", choices: ["Kenapa cuma ini?", "Terima kasih", "Diam saja"], correct: 1 },
+
+            // AKHLAK TERPUJI: TOLONG MENOLONG (16-20)
+            { question: "Melihat teman jatuh dari sepeda dan kakinya terluka, sikap kita adalah...", choices: ["Menertawakannya", "Menolongnya", "Membiarkannya"], correct: 1 },
+            { question: "Ibu sedang repot membawa belanjaan pasar yang berat. Apa yang kamu lakukan?", choices: ["Lari bermain", "Membantu membawakan", "Melihat saja"], correct: 1 },
+            { question: "Tolong-menolong harus dilakukan dalam hal...", choices: ["Kebaikan", "Kejahatan", "Mencontek"], correct: 0 },
+            { question: "Adik kesulitan mengerjakan PR matematika. Sebagai kakak, kamu sebaiknya...", choices: ["Mengerjakan semua PR-nya", "Mengajarinya caranya", "Memarahinya"], correct: 1 },
+            { question: "Manusia tidak bisa hidup sendiri dan butuh bantuan orang lain, maka manusia disebut makhluk...", choices: ["Sosial", "Individu", "Aneh"], correct: 0 },
+
+            // AKHLAK TERPUJI: TANGGUNG JAWAB (21-23)
+            { question: "Setelah selesai bermain mainan, anak yang bertanggung jawab akan...", choices: ["Meninggalkannya", "Menyuruh Ibu membereskan", "Merapikan kembali"], correct: 2 },
+            { question: "Jika kita berjanji kepada teman, maka kita wajib...", choices: ["Mengingkarinya", "Menepatinya", "Melupakannya"], correct: 1 },
+            { question: "Tugas utama seorang pelajar adalah...", choices: ["Bermain game", "Belajar dengan rajin", "Tidur seharian"], correct: 1 },
+
+            // AKHLAK TERCELA: DUSTA, IRI, SOMBONG (24-28)
+            { question: "Berkata tidak sesuai dengan kenyataan disebut...", choices: ["Jujur", "Dusta / Bohong", "Sopan"], correct: 1 },
+            { question: "Doni tidak suka melihat Edo mendapat nilai bagus. Doni ingin nilai Edo jelek. Sifat Doni ini disebut...", choices: ["Iri Hati / Dengki", "Baik Hati", "Tanggung Jawab"], correct: 0 },
+            { question: "Rina memamerkan tas barunya yang mahal dan mengejek tas teman yang jelek. Sikap Rina adalah...", choices: ["Rendah hati", "Sombong", "Dermawan"], correct: 1 },
+            { question: "Iblis diusir dari surga karena ia merasa lebih baik dari Nabi Adam. Iblis memiliki sifat...", choices: ["Sombong / Takabur", "Jujur", "Pemalu"], correct: 0 },
+            { question: "Akibat suka berbohong adalah...", choices: ["Disayang teman", "Tidak dipercaya orang", "Hati tenang"], correct: 1 },
+
+            // AKHLAK TERCELA: MALAS IBADAH (29-30)
+            { question: "Terdengar suara Azan Maghrib, tapi Anton masih asyik main game sampai waktu Isya. Anton termasuk anak yang...", choices: ["Rajin ibadah", "Malas beribadah", "Soleh"], correct: 1 },
+            { question: "Malas beribadah adalah perbuatan yang disukai oleh...", choices: ["Allah", "Malaikat", "Setan"], correct: 2 }
+        ];
+
+        // --- STATE VARIABLES ---
+        let gameState = 'start'; 
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timePercent = 100;
+        let isSpeaking = false;
+        let timerInterval = null;
+        let isFeedbackShowing = false;
+        
+        let currentUtterance = null;
+        
+        const app = document.getElementById('app');
+
+        // --- SVG CHARACTER (ANAK SOPAN) ---
+        function getPoliteKidSVG() {
+            return `
+            <svg viewBox="0 0 200 300" class="w-full h-auto char-breathe drop-shadow-xl" xmlns="http://www.w3.org/2000/svg">
+                <g transform="translate(0, 20)">
+                    <!-- Kaki -->
+                    <path d="M75 240 L75 290 A 5 5 0 0 0 90 295 L110 295 A 5 5 0 0 0 125 290 L125 240 Z" fill="#4B5563" />
+                    
+                    <!-- Celana -->
+                    <path d="M70 180 L130 180 L135 250 L65 250 Z" fill="#D97706" stroke="#B45309" stroke-width="2"/>
+
+                    <!-- Baju Koko -->
+                    <path d="M60 100 Q100 90 140 100 L145 190 Q100 200 55 190 Z" fill="#FFF7ED" stroke="#FDBA74" stroke-width="2"/>
+                    <circle cx="100" cy="130" r="3" fill="#F97316"/>
+                    <circle cx="100" cy="150" r="3" fill="#F97316"/>
+                    <circle cx="100" cy="170" r="3" fill="#F97316"/>
+
+                    <!-- Lengan Kiri -->
+                    <path d="M60 105 Q40 140 45 170" fill="none" stroke="#FFF7ED" stroke-width="18" stroke-linecap="round"/>
+                    <circle cx="45" cy="170" r="9" fill="#fce5cd"/>
+
+                    <!-- Lengan Kanan (Di Dada - Tanda Sopan) -->
+                    <path d="M140 105 Q130 150 100 140" fill="none" stroke="#FFF7ED" stroke-width="18" stroke-linecap="round"/>
+                    <circle cx="100" cy="140" r="9" fill="#fce5cd"/>
+
+                    <!-- Leher & Kepala -->
+                    <rect x="85" y="90" width="30" height="20" fill="#fce5cd"/>
+                    <ellipse cx="100" cy="70" rx="40" ry="45" fill="#fce5cd"/>
+                    
+                    <!-- Peci -->
+                    <path d="M55 50 Q100 25 145 50 L145 40 Q100 15 55 40 Z" fill="#1F2937"/>
+                    <rect x="55" y="50" width="90" height="15" fill="#1F2937" rx="2"/>
+
+                    <!-- Wajah -->
+                    <g class="eye-blink">
+                        <ellipse cx="82" cy="70" rx="5" ry="7" fill="#1F2937"/>
+                        <circle cx="83" cy="68" r="2" fill="white"/> 
+                        <ellipse cx="118" cy="70" rx="5" ry="7" fill="#1F2937"/>
+                        <circle cx="119" cy="68" r="2" fill="white"/> 
+                    </g>
+                    <!-- Senyum Ramah -->
+                    <path d="M85 90 Q100 100 115 90" fill="none" stroke="#1F2937" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="75" cy="85" r="5" fill="#FCA5A5" opacity="0.5"/>
+                    <circle cx="125" cy="85" r="5" fill="#FCA5A5" opacity="0.5"/>
+                </g>
+            </svg>
+            `;
+        }
+
+        // --- TTS FUNCTION (ROBUST) ---
+        function speakText(text, onEndCallback) {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            setTimeout(() => {
+                const textToSpeak = text
+                    .replace(/SWT/g, "Subhanahu wa ta'ala")
+                    .replace(/SAW/g, "Shallallahu 'Alaihi wa Sallam");
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID'; 
+                utterance.rate = 0.9; 
+                utterance.pitch = 1.1; 
+                
+                currentUtterance = utterance;
+
+                let hasCalledBack = false;
+                const done = () => {
+                    if (hasCalledBack) return;
+                    hasCalledBack = true;
+                    isSpeaking = false;
+                    updateStatusText();
+                    if (onEndCallback) onEndCallback();
+                };
+
+                const estimatedDuration = (textToSpeak.length * 100) + 3000;
+                const safetyTimer = setTimeout(() => {
+                    if (isSpeaking) {
+                        window.speechSynthesis.cancel();
+                        done();
+                    }
+                }, estimatedDuration);
+                
+                utterance.onstart = () => { isSpeaking = true; updateStatusText(); };
+                utterance.onend = () => { clearTimeout(safetyTimer); done(); };
+                utterance.onerror = (e) => { clearTimeout(safetyTimer); done(); };
+
+                try { window.speechSynthesis.speak(utterance); } catch (err) { done(); }
+            }, 50);
+        }
+
+        // --- LOGIC FUNCTIONS ---
+
+        function startQuiz() {
+            gameState = 'playing';
+            score = 0;
+            currentQuestionIndex = 0;
+            renderQuiz();
+            playQuestion();
+        }
+
+        function playQuestion() {
+            if(gameState !== 'playing') return;
+            timePercent = 100;
+            updateTimerUI();
+            
+            const q = allQuestions[currentQuestionIndex];
+            const text = `${q.question}. A. ${q.choices[0]}. B. ${q.choices[1]}. C. ${q.choices[2]}.`;
+            
+            clearInterval(timerInterval);
+            speakText(text, () => {
+                if(gameState === 'playing' && !isFeedbackShowing) startTimer();
+            });
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(timePercent > 0) {
+                    timePercent -= 1; 
+                    updateTimerUI();
+                } else {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); 
+                }
+            }, 50); 
+        }
+
+        function handleAnswer(choiceIndex) {
+            if(isFeedbackShowing) return;
+            window.speechSynthesis.cancel();
+            clearInterval(timerInterval);
+            isSpeaking = false;
+            isFeedbackShowing = true;
+
+            const isCorrect = choiceIndex === allQuestions[currentQuestionIndex].correct;
+            const isTimeout = choiceIndex === -1;
+
+            if(isCorrect) score += 10;
+
+            const appreciationMessages = [
+                "Masya Allah, Akhlakmu Mulia!", "Hebat! Kamu anak baik.", "Benar! Teruslah berbuat baik.",
+                "Alhamdulillah, jawabanmu tepat!", "Keren! Contohlah akhlak terpuji.", "Pintar sekali!"
+            ];
+
+            let feedbackTitle = "", feedbackText = "", speechText = "";
+
+            if (isCorrect) {
+                const randomMsg = appreciationMessages[Math.floor(Math.random() * appreciationMessages.length)];
+                feedbackTitle = "BENAR!";
+                feedbackText = randomMsg;
+                speechText = randomMsg;
+            } else if (isTimeout) {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "JAWABAN YANG BENAR";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-orange-600 block mt-2">${correctAns}</span>`;
+                speechText = `Jawabannya adalah ${correctAns}.`;
+            } else {
+                const correctAns = allQuestions[currentQuestionIndex].choices[allQuestions[currentQuestionIndex].correct];
+                feedbackTitle = "YAH, SALAH...";
+                feedbackText = `Jawabannya adalah:<br/><span class="font-black text-4xl text-orange-600 block mt-2">${correctAns}</span>`;
+                speechText = "Jawaban kurang tepat. Jangan menyerah!";
+            }
+
+            renderFeedback(isCorrect, isTimeout, feedbackTitle, feedbackText);
+            speakText(speechText);
+
+            setTimeout(() => {
+                isFeedbackShowing = false;
+                removeFeedback();
+                if (currentQuestionIndex < allQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuiz();
+                    playQuestion();
+                } else {
+                    finishQuiz();
+                }
+            }, 4000); 
+        }
+
+        function finishQuiz() {
+            gameState = 'result';
+            renderResult();
+            speakText("Alhamdulillah kuis selesai. Semoga kita berakhlak mulia!");
+        }
+
+        // --- RENDER FUNCTIONS ---
+
+        function updateStatusText() {
+            const el = document.getElementById('status-text');
+            if(el) el.innerText = isSpeaking ? "" : "Siap-siap...";
+        }
+
+        function updateTimerUI() {
+            const barEl = document.getElementById('timer-bar');
+            if(!barEl) return;
+            barEl.style.width = `${timePercent}%`;
+            
+            if (timePercent > 50) {
+                barEl.className = "h-full bg-green-500 transition-all duration-75 ease-linear rounded-full";
+            } else if (timePercent > 20) {
+                barEl.className = "h-full bg-yellow-400 transition-all duration-75 ease-linear rounded-full";
+            } else {
+                barEl.className = "h-full bg-red-600 transition-all duration-75 ease-linear rounded-full animate-pulse";
+            }
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen font-sans text-center w-full">
+                    <div class="bg-gradient-to-b from-orange-400 to-red-500 fixed inset-0 z-[-1]"></div>
+                    <div class="mb-6 animate-bounce text-yellow-200">
+                        <i data-lucide="heart" width="80" height="80" fill="currentColor"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-md text-white">
+                        Kuis Akhlak Mulia
+                    </h1>
+                    <p class="text-xl mb-6 bg-white/20 text-white p-4 rounded-xl backdrop-blur-sm">
+                        30 Soal Cerita <br/> (Jujur, Amanah & Sopan Santun)
+                    </p>
+                    <button onclick="startQuiz()" class="flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-red-900 font-bold py-4 px-12 rounded-full text-2xl shadow-lg transform transition hover:scale-105 active:scale-95">
+                        <i data-lucide="play" fill="currentColor"></i>
+                        MULAI KUIS
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function renderQuiz() {
+            const q = allQuestions[currentQuestionIndex];
+            
+            app.innerHTML = `
+                <div class="w-full flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-4 border-b-4 border-orange-200">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold">
+                            ${currentQuestionIndex + 1}
+                        </div>
+                        <span class="text-gray-500 font-medium">/ ${allQuestions.length}</span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full border border-yellow-300">
+                        <i data-lucide="star" class="text-yellow-500 fill-current" width="20"></i>
+                        <span class="font-bold text-yellow-700">${score}</span>
+                    </div>
+                </div>
+
+                <div class="w-full flex flex-col lg:flex-row gap-6 items-stretch">
+                    
+                    <div class="flex-1 flex flex-col w-full">
+                        <!-- Kotak Soal: Background Kuning Cerah, Teks Hitam -->
+                        <div class="w-full bg-yellow-100 rounded-3xl shadow-xl overflow-hidden mb-4 relative border-4 border-yellow-300">
+                            <div class="p-8 text-center">
+                                <h3 class="text-2xl md:text-3xl font-bold text-black leading-snug">
+                                    ${q.question}
+                                </h3>
+                                <p id="status-text" class="mt-4 text-sm text-gray-600 italic min-h-[20px]"></p>
+                            </div>
+                        </div>
+
+                        <div class="w-full mb-4 bg-gray-200 rounded-full h-12 border-4 border-white shadow-md overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center text-xl font-bold text-gray-500 z-10 tracking-widest uppercase">Waktu</div>
+                            <div id="timer-bar" class="h-full bg-green-500 transition-all duration-75 ease-linear rounded-full" style="width: 100%;"></div>
+                        </div>
+
+                        <div class="w-full grid gap-4">
+                            ${q.choices.map((choice, idx) => {
+                                const labels = ["A", "B", "C"];
+                                return `
+                                    <button onclick="handleAnswer(${idx})" class="group relative flex items-center p-4 md:p-6 rounded-2xl border-b-8 transition-all transform active:scale-95 bg-white hover:bg-orange-50 border-orange-200 hover:border-orange-400 shadow-md hover:shadow-lg">
+                                        <div class="bg-orange-500 text-white font-bold w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl md:text-3xl mr-6 group-hover:bg-orange-600 transition shrink-0">
+                                            ${labels[idx]}
+                                        </div>
+                                        <span class="text-xl md:text-2xl font-bold text-gray-700 text-left leading-tight w-full">${choice}</span>
+                                    </button>
+                                `
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="hidden lg:flex flex-col items-center justify-end w-64 shrink-0 relative">
+                        <div class="mb-4 bg-white p-4 rounded-xl rounded-bl-none shadow-lg border-2 border-orange-200 animate-bounce">
+                            <p class="text-orange-700 font-bold text-center">Jadilah Anak Baik!</p>
+                        </div>
+                        ${getPoliteKidSVG()}
+                    </div>
+
+                </div>
+            `;
+            lucide.createIcons();
+            updateTimerUI(); 
+        }
+
+        function renderFeedback(isCorrect, isTimeout, title, textContent) {
+            const overlay = document.createElement('div');
+            overlay.id = 'feedback-overlay';
+            overlay.className = 'fixed inset-0 flex items-center justify-center bg-black/50 z-50 backdrop-blur-sm fade-in';
+            
+            let content = '';
+            if (isCorrect) {
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-green-500">
+                        <div class="mx-auto mb-4 text-green-500"><i data-lucide="check-circle" width="80" height="80"></i></div>
+                        <h2 class="text-4xl font-black text-green-600">${title}</h2>
+                        <p class="text-gray-500 mt-2 text-xl font-bold">${textContent}</p>
+                    </div>
+                `;
+            } else {
+                let iconHtml = '';
+                if (!isTimeout) {
+                    iconHtml = `<div class="mx-auto mb-4 text-red-500"><i data-lucide="x-circle" width="80" height="80"></i></div>`;
+                }
+                content = `
+                    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center transform scale-110 transition-all border-b-8 border-red-500">
+                        ${iconHtml}
+                        <h2 class="text-2xl font-black text-red-600 uppercase tracking-wide">${title}</h2>
+                        <p class="text-gray-500 mt-2">${textContent}</p>
+                    </div>
+                `;
+            }
+            overlay.innerHTML = content;
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+
+        function removeFeedback() {
+            const el = document.getElementById('feedback-overlay');
+            if(el) el.remove();
+        }
+
+        function renderResult() {
+            const maxScore = allQuestions.length * 10;
+            const percentage = (score / maxScore) * 100;
+            const isHighscore = score > 270; 
+
+            let message = "";
+            if (isHighscore) {
+                message = "Subhanallah! Kamu Anak Berakhlak Mulia!";
+                startFlowerRain();
+            } else if (percentage > 70) {
+                message = "Alhamdulillah! Pertahankan sikap baikmu!";
+            } else {
+                message = "Jangan putus asa, ayo perbaiki akhlak lagi!";
+            }
+
+            app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen text-white text-center relative overflow-hidden">
+                    <div class="bg-gradient-to-b from-orange-500 to-red-600 fixed inset-0 z-[-1]"></div>
+                    <div class="z-10 mb-6 text-yellow-300 drop-shadow-lg">
+                         <i data-lucide="trophy" width="100" height="100"></i>
+                    </div>
+                    <h2 class="text-4xl font-bold mb-2 z-10">Nilai Akhir</h2>
+                    <div class="text-7xl font-black mb-4 text-yellow-100 drop-shadow-md z-10">
+                        ${score}
+                    </div>
+                    <p class="text-lg mb-8 z-10">
+                        Dari Total ${maxScore} Poin
+                    </p>
+                    <p class="text-xl mb-8 font-bold bg-white/20 p-4 rounded-xl z-10 max-w-lg leading-relaxed">
+                        ${message}
+                    </p>
+                    <button onclick="location.reload()" class="flex items-center gap-2 bg-white text-orange-600 font-bold py-3 px-8 rounded-full text-xl shadow-lg hover:bg-gray-100 transition z-10 cursor-pointer">
+                        <i data-lucide="refresh-ccw" width="24"></i>
+                        Main Lagi
+                    </button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function startFlowerRain() {
+            const emojis = ['🌸', '🌺', '🌹', '🌻', '🌷', '💐'];
+            for(let i=0; i<50; i++) {
+                const el = document.createElement('div');
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = 'flower-drop text-4xl';
+                el.style.left = Math.random() * 100 + '%';
+                el.style.animationDuration = (3 + Math.random() * 4) + 's';
+                el.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(el);
+            }
+        }
+
+        // --- INIT ---
+        renderStart();
+
+    </script>
+</body>
+</html>
