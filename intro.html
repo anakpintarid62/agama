@@ -1,183 +1,232 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, Bell, Star, Heart, Cloud } from 'lucide-react';
-
-export default function KidsIntroVideo() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [scene, setScene] = useState('intro'); // intro, speaking, subscribe, end
-  const [showButton, setShowButton] = useState(false);
-  
-  // Text to be spoken
-  const textToSpeak = "Sebelum memulai, wajib anda subscribe, supaya tidak ketinggalan kuis terbaru, dari Anak Pintar Indonesia!";
-
-  const speak = () => {
-    // Check browser support
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      utterance.lang = 'id-ID'; // Try to set Indonesian
-      utterance.rate = 0.9; // Slightly slower for kids
-      utterance.pitch = 1.2; // Slightly higher pitch (friendly)
-      utterance.volume = 1;
-
-      // Select a voice if available (optional refinement)
-      const voices = window.speechSynthesis.getVoices();
-      const indoVoice = voices.find(v => v.lang.includes('id'));
-      if (indoVoice) utterance.voice = indoVoice;
-
-      window.speechSynthesis.speak(utterance);
-      
-      // Sync animations roughly with speech
-      setTimeout(() => setScene('speaking'), 500);
-      setTimeout(() => setScene('subscribe'), 4500); // Show subscribe button halfway
-      setTimeout(() => setScene('end'), 9000); // End scene
-      
-      utterance.onend = () => {
-        setIsPlaying(false);
-        setShowButton(true);
-      };
-    } else {
-      alert("Browser anda tidak mendukung fitur suara otomatis.");
-    }
-  };
-
-  const handleStart = () => {
-    setIsPlaying(true);
-    setShowButton(false);
-    setScene('intro');
-    speak();
-  };
-
-  // Background decoration component
-  const Background = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <div className="absolute top-5 left-10 text-white opacity-80 animate-bounce delay-100">
-        <Cloud size={60} fill="white" />
-      </div>
-      <div className="absolute top-10 right-20 text-white opacity-80 animate-bounce delay-700">
-        <Cloud size={80} fill="white" />
-      </div>
-      <div className="absolute bottom-10 left-20 text-yellow-200 animate-pulse">
-        <Star size={40} fill="currentColor" />
-      </div>
-      <div className="absolute top-1/2 right-10 text-pink-300 animate-pulse delay-300">
-        <Heart size={30} fill="currentColor" />
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4 font-sans">
-      
-      {/* 16:9 Container */}
-      <div className="relative w-full max-w-4xl aspect-video bg-gradient-to-b from-sky-400 to-sky-300 rounded-3xl shadow-2xl overflow-hidden border-8 border-white">
-        
-        <Background />
-
-        {/* Start Overlay */}
-        {!isPlaying && !showButton && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm">
-            <button 
-              onClick={handleStart}
-              className="group relative bg-yellow-400 hover:bg-yellow-300 text-red-600 font-black text-3xl px-12 py-6 rounded-full shadow-[0_10px_0_rgb(200,100,0)] active:shadow-none active:translate-y-2 transition-all duration-200 flex items-center gap-4"
-            >
-              <Play size={40} fill="currentColor" />
-              MULAI VIDEO
-            </button>
-            <p className="mt-6 text-white font-bold text-xl drop-shadow-md">Klik untuk mendengarkan!</p>
-          </div>
-        )}
-
-        {/* Replay Button */}
-        {showButton && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-             <div className="bg-white p-8 rounded-3xl text-center animate-bounce-in">
-                <h2 className="text-3xl font-bold text-sky-600 mb-4">Hebat!</h2>
-                <button 
-                  onClick={handleStart}
-                  className="bg-green-500 hover:bg-green-400 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg transition-transform hover:scale-105"
-                >
-                  Putar Lagi ↺
-                </button>
-             </div>
-          </div>
-        )}
-
-        {/* Main Content Area */}
-        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center p-8 text-center">
-          
-          {/* Title - Always visible but animates */}
-          <h1 className={`text-4xl md:text-5xl font-extrabold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.3)] mb-8 transition-all duration-500 ${scene === 'intro' ? 'scale-100' : 'scale-75 -translate-y-10'}`}>
-            ANAK PINTAR <span className="text-yellow-300">INDONESIA</span>
-          </h1>
-
-          {/* Character/Mascot Area */}
-          <div className="flex items-center justify-center mb-6">
-             <div className={`transition-all duration-500 transform ${isPlaying ? 'scale-110' : 'scale-100'}`}>
-                {/* Simple CSS Avatar */}
-                <div className="w-32 h-32 md:w-40 md:h-40 bg-orange-200 rounded-full border-4 border-white shadow-xl flex items-center justify-center relative overflow-hidden">
-                    {/* Eyes */}
-                    <div className="absolute top-10 left-8 w-4 h-6 bg-black rounded-full animate-blink"></div>
-                    <div className="absolute top-10 right-8 w-4 h-6 bg-black rounded-full animate-blink"></div>
-                    {/* Mouth - Moves when speaking */}
-                    <div className={`absolute bottom-8 w-10 h-5 border-b-4 border-red-500 rounded-full transition-all duration-100 ${isPlaying ? 'h-8 animate-talk' : 'h-5'}`}></div>
-                    {/* Cheeks */}
-                    <div className="absolute top-14 left-4 w-6 h-4 bg-pink-300 rounded-full opacity-60"></div>
-                    <div className="absolute top-14 right-4 w-6 h-4 bg-pink-300 rounded-full opacity-60"></div>
-                </div>
-             </div>
-          </div>
-
-          {/* Dynamic Text Bubble */}
-          <div className="relative">
-             <div className={`bg-white rounded-2xl p-6 shadow-xl max-w-2xl transform transition-all duration-500 ${isPlaying ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-                {/* Little triangle for speech bubble */}
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-white rotate-45"></div>
-                
-                <p className="text-2xl md:text-3xl font-bold text-gray-700 leading-relaxed">
-                  "Sebelum memulai <span className="text-red-500">wajib</span> anda subscribe..."
-                </p>
-             </div>
-          </div>
-
-          {/* Subscribe Pop-up */}
-          { (scene === 'subscribe' || scene === 'end') && (
-            <div className="absolute bottom-10 animate-bounce-in-up">
-              <div className="bg-red-600 text-white px-10 py-4 rounded-full border-4 border-white shadow-2xl flex items-center gap-4 transform transition-transform hover:scale-110 cursor-pointer">
-                <Bell className="animate-wiggle" size={32} fill="white" />
-                <span className="text-3xl font-black tracking-widest uppercase">Subscribe</span>
-              </div>
-              <div className="text-center mt-2 text-white font-bold text-lg animate-pulse">
-                 👆 Klik tombol merah!
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-
-      {/* CSS Animations embedded for single-file requirement */}
-      <style>{`
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anak Pintar Indonesia - Intro Video</title>
+    <!-- Menggunakan Tailwind CSS untuk styling cepat -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Keyframes Animations */
         @keyframes blink {
-          0%, 100% { height: 24px; }
-          50% { height: 2px; }
+            0%, 100% { height: 24px; }
+            50% { height: 2px; }
         }
         @keyframes talk {
-          0%, 100% { height: 20px; border-radius: 50%; }
-          50% { height: 10px; border-radius: 0%; }
+            0%, 100% { height: 20px; border-radius: 50%; }
+            50% { height: 10px; border-radius: 0%; }
         }
         @keyframes wiggle {
-          0%, 100% { transform: rotate(-10deg); }
-          50% { transform: rotate(10deg); }
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
         }
         @keyframes bounce-in-up {
-          0% { transform: translateY(100px) scale(0); opacity: 0; }
-          80% { transform: translateY(-10px) scale(1.1); opacity: 1; }
-          100% { transform: translateY(0) scale(1); opacity: 1; }
+            0% { transform: translateY(100px) scale(0); opacity: 0; }
+            80% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
         }
+        
+        /* Utility Classes for Animation */
         .animate-blink { animation: blink 3s infinite; }
         .animate-talk { animation: talk 0.2s infinite; }
         .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
         .animate-bounce-in-up { animation: bounce-in-up 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-      `}</style>
+        
+        /* Helper to hide/show elements with transition */
+        .hidden-el { display: none !important; }
+        .opacity-0-el { opacity: 0; transform: translateY(20px); }
+        .opacity-100-el { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+
+    <!-- 16:9 Container -->
+    <div class="relative w-full max-w-4xl aspect-video bg-gradient-to-b from-sky-400 to-sky-300 rounded-3xl shadow-2xl overflow-hidden border-8 border-white">
+        
+        <!-- Background Decorations -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none">
+            <!-- Cloud 1 -->
+            <div class="absolute top-5 left-10 text-white opacity-80 animate-bounce delay-100">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c0-1.7-1.3-3-3-3h-1.1c-.1-2.6-2.2-4.6-4.8-4.5-2.6.1-4.6 2.2-4.5 4.8v.2c-1.6.2-2.8 1.5-2.8 3.2s1.2 3 3 3h10.3c1.6 0 3-1.3 3-3z"></path></svg>
+            </div>
+            <!-- Cloud 2 -->
+            <div class="absolute top-10 right-20 text-white opacity-80 animate-bounce" style="animation-delay: 0.7s;">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19c0-1.7-1.3-3-3-3h-1.1c-.1-2.6-2.2-4.6-4.8-4.5-2.6.1-4.6 2.2-4.5 4.8v.2c-1.6.2-2.8 1.5-2.8 3.2s1.2 3 3 3h10.3c1.6 0 3-1.3 3-3z"></path></svg>
+            </div>
+            <!-- Star -->
+            <div class="absolute bottom-10 left-20 text-yellow-200 animate-pulse">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <!-- Heart -->
+            <div class="absolute top-1/2 right-10 text-pink-300 animate-pulse" style="animation-delay: 0.3s;">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            </div>
+        </div>
+
+        <!-- Start Overlay -->
+        <div id="start-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-500">
+            <button id="btn-start" class="group relative bg-yellow-400 hover:bg-yellow-300 text-red-600 font-black text-3xl px-12 py-6 rounded-full shadow-[0_10px_0_rgb(200,100,0)] active:shadow-none active:translate-y-2 transition-all duration-200 flex items-center gap-4">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                MULAI VIDEO
+            </button>
+            <p class="mt-6 text-white font-bold text-xl drop-shadow-md">Klik untuk mendengarkan!</p>
+        </div>
+
+        <!-- Replay Overlay (Hidden initially) -->
+        <div id="replay-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm hidden-el">
+             <div class="bg-white p-8 rounded-3xl text-center animate-bounce-in-up">
+                <h2 class="text-3xl font-bold text-sky-600 mb-4">Hebat!</h2>
+                <button id="btn-replay" class="bg-green-500 hover:bg-green-400 text-white font-bold text-xl px-8 py-4 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 mx-auto">
+                    Putar Lagi ↺
+                </button>
+             </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-8 text-center">
+          
+            <!-- Title -->
+            <h1 id="main-title" class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.3)] mb-8 transition-all duration-500 scale-100">
+                ANAK PINTAR <span class="text-yellow-300">INDONESIA</span>
+            </h1>
+
+            <!-- Character/Mascot -->
+            <div class="flex items-center justify-center mb-6">
+                <div id="character-container" class="transition-all duration-500 transform scale-100">
+                    <div class="w-32 h-32 md:w-40 md:h-40 bg-orange-200 rounded-full border-4 border-white shadow-xl flex items-center justify-center relative overflow-hidden">
+                        <!-- Eyes -->
+                        <div class="absolute top-10 left-8 w-4 h-6 bg-black rounded-full animate-blink"></div>
+                        <div class="absolute top-10 right-8 w-4 h-6 bg-black rounded-full animate-blink"></div>
+                        <!-- Mouth -->
+                        <div id="mouth" class="absolute bottom-8 w-10 h-5 border-b-4 border-red-500 rounded-full transition-all duration-100 h-5"></div>
+                        <!-- Cheeks -->
+                        <div class="absolute top-14 left-4 w-6 h-4 bg-pink-300 rounded-full opacity-60"></div>
+                        <div class="absolute top-14 right-4 w-6 h-4 bg-pink-300 rounded-full opacity-60"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Bubble -->
+            <div class="relative">
+                <div id="speech-bubble" class="bg-white rounded-2xl p-6 shadow-xl max-w-2xl transform transition-all duration-500 opacity-0-el">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-white rotate-45"></div>
+                    <p class="text-2xl md:text-3xl font-bold text-gray-700 leading-relaxed">
+                        "Sebelum memulai <span class="text-red-500">wajib</span> anda subscribe..."
+                    </p>
+                </div>
+            </div>
+
+            <!-- Subscribe Pop-up (Hidden initially) -->
+            <div id="subscribe-popup" class="absolute bottom-10 hidden-el">
+                <div class="bg-red-600 text-white px-10 py-4 rounded-full border-4 border-white shadow-2xl flex items-center gap-4 transform transition-transform hover:scale-110 cursor-pointer animate-bounce-in-up">
+                    <svg class="animate-wiggle" width="32" height="32" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <span class="text-3xl font-black tracking-widest uppercase">Subscribe</span>
+                </div>
+                <div class="text-center mt-2 text-white font-bold text-lg animate-pulse">
+                    👆 Klik tombol merah!
+                </div>
+            </div>
+
+        </div>
     </div>
-  );
-}
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Elements
+        const startOverlay = document.getElementById('start-overlay');
+        const replayOverlay = document.getElementById('replay-overlay');
+        const btnStart = document.getElementById('btn-start');
+        const btnReplay = document.getElementById('btn-replay');
+        
+        const mainTitle = document.getElementById('main-title');
+        const characterContainer = document.getElementById('character-container');
+        const mouth = document.getElementById('mouth');
+        const speechBubble = document.getElementById('speech-bubble');
+        const subscribePopup = document.getElementById('subscribe-popup');
+
+        const textToSpeak = "Sebelum memulai, wajib anda subscribe, supaya tidak ketinggalan kuis terbaru, dari Anak Pintar Indonesia!";
+        let isSpeaking = false;
+
+        // Function to animate mouth
+        function setMouthTalking(talking) {
+            if (talking) {
+                mouth.classList.add('animate-talk');
+                mouth.style.height = "20px"; // Open mouth
+            } else {
+                mouth.classList.remove('animate-talk');
+                mouth.style.height = "5px"; // Close mouth default
+            }
+        }
+
+        // Main Logic
+        function playVideo() {
+            if (!('speechSynthesis' in window)) {
+                alert("Maaf, browser anda tidak mendukung suara otomatis.");
+                return;
+            }
+
+            // Reset UI
+            startOverlay.classList.add('hidden-el');
+            replayOverlay.classList.add('hidden-el');
+            subscribePopup.classList.add('hidden-el');
+            
+            // Animation: Move Title Up
+            mainTitle.classList.remove('scale-100');
+            mainTitle.classList.add('scale-75', '-translate-y-10');
+            
+            // Animation: Scale Character
+            characterContainer.classList.add('scale-110');
+
+            // Show Bubble
+            speechBubble.classList.remove('opacity-0-el');
+            speechBubble.classList.add('opacity-100-el');
+
+            // Setup Speech
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            utterance.lang = 'id-ID';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.2;
+            utterance.volume = 1;
+
+            // Try to find Indonesian voice
+            const voices = window.speechSynthesis.getVoices();
+            const indoVoice = voices.find(v => v.lang.includes('id'));
+            if (indoVoice) utterance.voice = indoVoice;
+
+            // Events
+            utterance.onstart = () => {
+                isSpeaking = true;
+                setMouthTalking(true);
+                
+                // Timeline events based on estimated speech duration
+                // Show subscribe button halfway through (approx 4.5s)
+                setTimeout(() => {
+                    if(isSpeaking) {
+                        subscribePopup.classList.remove('hidden-el');
+                    }
+                }, 4500);
+            };
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                setMouthTalking(false);
+                characterContainer.classList.remove('scale-110');
+                
+                // Show replay button after short delay
+                setTimeout(() => {
+                    replayOverlay.classList.remove('hidden-el');
+                }, 500);
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Event Listeners
+        btnStart.addEventListener('click', playVideo);
+        btnReplay.addEventListener('click', playVideo);
+
+        // Pre-load voices (fix for Chrome sometimes needing this)
+        window.speechSynthesis.getVoices();
+    </script>
+</body>
+</html>
